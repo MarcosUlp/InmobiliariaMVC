@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using InmobiliariaMVC.Models;
+// Asegúrate de que el namespace coincida con tu estructura de carpetas (PascalCase es la convención)
+using InmobiliariaMVC.Repositories; 
 
 namespace InmobiliariaMVC.Controllers
 {
@@ -12,21 +14,23 @@ namespace InmobiliariaMVC.Controllers
     {
         private readonly RepositorioInquilino _repo;
 
+        // El nombre del tipo debe coincidir con el nombre de la clase (PascalCase)
         public InquilinosController(RepositorioInquilino repo)
         {
             _repo = repo;
         }
 
         // GET: Inquilinos
-        public async Task<IActionResult> Index()
+        // Quitamos async Task<> porque no hay 'await'
+        public IActionResult Index()
         {
             var lista = _repo.ObtenerTodos();
             return View(lista);
-
         }
 
         // GET: Inquilinos/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // Quitamos async Task<>
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
@@ -49,11 +53,10 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // POST: Inquilinos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdInquilino,Nombre,Apellido,Dni,Telefono,Email")] Inquilino inquilino)
+        // Quitamos async Task<>
+        public IActionResult Create([Bind("IdInquilino,Nombre,Apellido,Dni,Telefono,Email")] Inquilino inquilino)
         {
             if (ModelState.IsValid)
             {
@@ -64,7 +67,8 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Inquilinos/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // Quitamos async Task<>
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
@@ -81,34 +85,35 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // POST: Inquilinos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdInquilino,Nombre,Apellido,Dni,Telefono,Email")] Inquilino inquilino)
+        // Quitamos async Task<>
+        public IActionResult Edit(int id, Inquilino inquilino)
         {
-            if (id != inquilino.IdInquilino)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                bool editado = _repo.Editar(inquilino); // que devuelva true si se editó correctamente
-
-                if (!editado)
+                if (id != inquilino.IdInquilino)
                 {
-                    return NotFound(); // o mensaje de error personalizado
+                    return NotFound();
                 }
 
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    // La variable correcta es _repo (con guion bajo)
+                    _repo.Editar(inquilino); 
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(inquilino);
             }
-
-            return View(inquilino);
+            catch
+            {
+                return View();
+            }
         }
 
         // GET: Inquilinos/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // Quitamos async Task<>
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
@@ -127,11 +132,11 @@ namespace InmobiliariaMVC.Controllers
         // POST: Inquilinos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // Quitamos async Task<>
+        public IActionResult DeleteConfirmed(int id)
         {
             _repo.Eliminar(id);
             return RedirectToAction(nameof(Index));
-
         }
 
         private bool InquilinoExists(int id)
