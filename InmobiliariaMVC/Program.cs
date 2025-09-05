@@ -1,13 +1,22 @@
+// Reemplaza TODO el contenido de este archivo
+
+using InmobiliariaMVC.Models;
 using InmobiliariaMVC.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Registramos Database y Repositorios para inyección de dependencias
-builder.Services.AddScoped<Database>();
-builder.Services.AddScoped<RepositorioInquilino>();
-builder.Services.AddScoped<RepositorioPropietario>();
+// --- AQUÍ ESTÁ LA MAGIA ---
+// 1. Creamos UNA SOLA instancia de Database para toda la aplicación.
+builder.Services.AddSingleton(new Database(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 2. Le decimos al sistema cómo crear cada repositorio cuando un controlador lo pida.
+builder.Services.AddTransient<RepositorioInquilino>();
+builder.Services.AddTransient<RepositorioPropietario>();
+builder.Services.AddTransient<RepositorioInmueble>();
+// --- FIN DE LA MAGIA ---
 
 var app = builder.Build();
 
@@ -20,9 +29,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(

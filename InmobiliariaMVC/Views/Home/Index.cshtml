@@ -1,8 +1,86 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Página Principal";
 }
 
+<style>
+    /* Estilos opcionales para mejorar la apariencia */
+    .card-icon {
+        font-size: 4rem; /* Tamaño grande para los íconos */
+        color: #0d6efd; /* Color primario de Bootstrap */
+        transition: transform 0.2s;
+    }
+
+    .card:hover .card-icon {
+        transform: scale(1.1); /* Efecto de zoom al pasar el mouse */
+    }
+
+    .card-link {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .card-link .card {
+        transition: box-shadow 0.3s, transform 0.3s;
+    }
+
+    .card-link:hover .card {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+</style>
+
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Bienvenido al Sistema de Gestión</h1>
+    <p>Selecciona una opción para comenzar a administrar la inmobiliaria.</p>
+</div>
+
+<hr class="my-4">
+
+<div class="row justify-content-center g-4 mt-4">
+
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Propietarios" asp-action="Index" class="card-link">
+            <div class="card text-center h-100 p-3">
+                <div class="card-body">
+                    <i class="fas fa-user-tie card-icon mb-3"></i>
+                    <h5 class="card-title">Gestionar Propietarios</h5>
+                    <p class="card-text">Administra el alta, baja y modificación de los dueños de inmuebles.</p>
+                </div>
+                 <div class="card-footer bg-transparent border-0">
+                    <span class="btn btn-primary">Ir a Propietarios</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Inquilinos" asp-action="Index" class="card-link">
+            <div class="card text-center h-100 p-3">
+                <div class="card-body">
+                    <i class="fas fa-user-friends card-icon mb-3"></i>
+                    <h5 class="card-title">Gestionar Inquilinos</h5>
+                    <p class="card-text">Administra los datos y contratos de todos los inquilinos registrados.</p>
+                </div>
+                 <div class="card-footer bg-transparent border-0">
+                    <span class="btn btn-primary">Ir a Inquilinos</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <a asp-controller="Inmuebles" asp-action="Index" class="card-link">
+            <div class="card text-center h-100 p-3">
+                <div class="card-body">
+                    <i class="fas fa-home card-icon mb-3"></i>
+                    <h5 class="card-title">Gestionar Inmuebles</h5>
+                    <p class="card-text">Consulta, agrega y edita las propiedades disponibles en el sistema.</p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <span class="btn btn-primary">Ir a Inmuebles</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
 </div>

@@ -7,22 +7,28 @@ using System.Threading.Tasks;
 namespace InmobiliariaMVC.Models
 {
 	public class Propietario
-	{
-		[Key]//esto indica que es clave primaria
-		[Display(Name = "Código Int.")]
-		public int IdPropietario { get; set; }
-		[Required]//no null
-		public string Nombre { get; set; }
-		[Required]
-		public string Apellido { get; set; }
-		[Required]
-		public string Dni { get; set; }
-		[Display(Name = "Teléfono")]//solo afecta como se muestra en la vista
-		public string Telefono { get; set; }
-		[Required, EmailAddress]
-		public string Email { get; set; }
-		[Required(ErrorMessage = "La clave es obligatoria"), DataType(DataType.Password)]// en la view se muestra como contraseña
-		public string Clave { get; set; }
+    {
+        [Key]
+        [Display(Name = "Código Int.")]
+        public int IdPropietario { get; set; }
+        
+        [Required]
+        public string Nombre { get; set; } = string.Empty; // Valor inicial
+
+        [Required]
+        public string Apellido { get; set; } = string.Empty; // Valor inicial
+
+        [Required]
+        public string Dni { get; set; } = string.Empty; // Valor inicial
+
+        [Display(Name = "Teléfono")]
+        public string Telefono { get; set; } = string.Empty; // Valor inicial
+
+        [Required, EmailAddress]
+        public string Email { get; set; } = string.Empty; // Valor inicial
+
+        [Required(ErrorMessage = "La clave es obligatoria"), DataType(DataType.Password)]
+        public string Clave { get; set; } = string.Empty; // Valor inicial
 
 		public override string ToString()
 		{

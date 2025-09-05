@@ -1,17 +1,22 @@
+// Reemplaza TODO el contenido de este archivo
+
 using MySql.Data.MySqlClient;
-using Microsoft.Extensions.Configuration;
 
-public class Database
+namespace InmobiliariaMVC.Models
 {
-    private readonly string _connectionString;
-
-    public Database(IConfiguration configuration)
+    public class Database
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection");
-    }
+        private readonly string connectionString;
 
-    public MySqlConnection GetConnection()
-    {
-        return new MySqlConnection(_connectionString);
+        public Database(string connectionString)
+        {
+            this.connectionString = connectionString;
+        }
+
+        // Este es el método clave que tus repositorios necesitan
+        public MySqlConnection GetConnection()
+        {
+            return new MySqlConnection(connectionString);
+        }
     }
 }

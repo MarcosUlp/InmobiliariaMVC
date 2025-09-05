@@ -1,0 +1,45 @@
+@model IEnumerable<InmobiliariaMVC.Models.Inmueble>
+
+@{
+    ViewData["Title"] = "Inmuebles";
+}
+
+<h1>Listado de Inmuebles</h1>
+
+<p>
+    <a asp-action="Create">Crear Nuevo Inmueble</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Dirección</th>
+            <th>Uso</th>
+            <th>Tipo</th>
+            <th>Ambientes</th>
+            <th>Precio</th>
+            <th>Dueño</th>
+            <th>Disponible</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.IdInmueble)</td>
+            <td>@Html.DisplayFor(modelItem => item.Direccion)</td>
+            <td>@Html.DisplayFor(modelItem => item.Uso)</td>
+            <td>@Html.DisplayFor(modelItem => item.Tipo)</td>
+            <td>@Html.DisplayFor(modelItem => item.Ambientes)</td>
+            <td>@Html.DisplayFor(modelItem => item.Precio)</td>
+            <td>@(item.Dueño.Nombre + " " + item.Dueño.Apellido)</td>
+            <td>@(item.Disponible ? "Sí" : "No")</td>
+            <td>
+                @Html.ActionLink("Editar", "Edit", new { id=item.IdInmueble }) |
+                @Html.ActionLink("Detalles", "Details", new { id=item.IdInmueble }) |
+                @Html.ActionLink("Eliminar", "Delete", new { id=item.IdInmueble })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
