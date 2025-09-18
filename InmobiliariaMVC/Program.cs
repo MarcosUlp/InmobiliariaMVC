@@ -16,6 +16,7 @@ builder.Services.AddSingleton(new Database(builder.Configuration.GetConnectionSt
 builder.Services.AddTransient<RepositorioInquilino>();
 builder.Services.AddTransient<RepositorioPropietario>();
 builder.Services.AddTransient<RepositorioInmueble>();
+builder.Services.AddTransient<RepositorioContrato>();
 // --- FIN DE LA MAGIA ---
 
 var app = builder.Build();

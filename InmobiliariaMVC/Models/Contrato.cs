@@ -28,9 +28,15 @@ namespace InmobiliariaMVC.Models
 
         [Required]
         [DataType(DataType.Currency)]
-        public decimal Monto { get; set; }
+        [Display(Name = "Precio Mensual")]
+        public decimal PrecioMensual { get; set; }
 
-        // 👇 Propiedades de navegación (no se guardan en BD, pero ayudan en las vistas)
+        [Required]
+        [StringLength(50)]
+        [Display(Name = "Estado")]
+        public string Estado { get; set; } = string.Empty;  // <-- Agregado
+
+        // Propiedades de navegación (no se guardan en BD, pero ayudan en las vistas)
         public Inmueble? Inmueble { get; set; }
         public Inquilino? Inquilino { get; set; }
     }
