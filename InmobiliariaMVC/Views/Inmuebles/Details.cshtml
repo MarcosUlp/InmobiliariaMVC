@@ -1,0 +1,21 @@
+@model InmobiliariaMVC.Models.Inmueble
+
+@{
+    ViewData["Title"] = "Detalles";
+}
+
+<h1>Detalles del Inmueble</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">Dirección</dt>
+        <dd class = "col-sm-10">@Html.DisplayFor(model => model.Direccion)</dd>
+        <dt class = "col-sm-2">Dueño</dt>
+        <dd class = "col-sm-10">@(Model.Dueño.Nombre + " " + Model.Dueño.Apellido)</dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Editar", "Edit", new { id = Model.IdInmueble }) |
+    <a asp-action="Index">Volver al Listado</a>
+</div>

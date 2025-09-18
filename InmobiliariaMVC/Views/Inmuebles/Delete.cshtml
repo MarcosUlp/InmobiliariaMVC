@@ -1,0 +1,25 @@
+@model InmobiliariaMVC.Models.Inmueble
+
+@{
+    ViewData["Title"] = "Eliminar";
+}
+
+<h1>Eliminar Inmueble</h1>
+
+<h3>¿Estás seguro de que quieres eliminar esto?</h3>
+<div>
+    <h4>Inmueble</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">Dirección</dt>
+        <dd class = "col-sm-10">@Html.DisplayFor(model => model.Direccion)</dd>
+         <dt class = "col-sm-2">Dueño</dt>
+        <dd class = "col-sm-10">@(Model.Dueño.Nombre + " " + Model.Dueño.Apellido)</dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="IdInmueble" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+        <a asp-action="Index">Volver al Listado</a>
+    </form>
+</div>
