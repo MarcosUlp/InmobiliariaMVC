@@ -21,7 +21,6 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Inquilinos
-        // Quitamos async Task<> porque no hay 'await'
         public IActionResult Index()
         {
             var lista = _repo.ObtenerTodos();

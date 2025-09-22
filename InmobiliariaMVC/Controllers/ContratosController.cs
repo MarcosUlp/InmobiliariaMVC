@@ -8,13 +8,13 @@ namespace InmobiliariaMVC.Controllers
 {
     public class ContratosController : Controller
     {
-        private readonly RepositorioContrato repo;
+        private readonly RepositorioContrato repoContrato;
         private readonly RepositorioInquilino repoInquilino;
         private readonly RepositorioInmueble repoInmueble;
 
-        public ContratosController(RepositorioContrato repo, RepositorioInquilino repoInquilino, RepositorioInmueble repoInmueble)
+        public ContratosController(RepositorioContrato repoContrato, RepositorioInquilino repoInquilino, RepositorioInmueble repoInmueble)
         {
-            this.repo = repo;
+            this.repoContrato = repoContrato;
             this.repoInquilino = repoInquilino;
             this.repoInmueble = repoInmueble;
         }
@@ -22,18 +22,20 @@ namespace InmobiliariaMVC.Controllers
         // GET: Contratos
         public IActionResult Index()
         {
-            var lista = repo.ObtenerTodos();
+            var lista = repoContrato.ObtenerTodos();
             return View(lista);
         }
 
         // GET: Contratos/Details/5
         public IActionResult Details(int id)
         {
-            var contrato = repo.ObtenerPorId(id);
+            var contrato = repoContrato.ObtenerPorId(id);
             return View(contrato);
         }
 
         // GET: Contratos/Create
+        // GET: Contratos/Create
+        [HttpGet]
         public IActionResult Create()
         {
             ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
@@ -46,24 +48,33 @@ namespace InmobiliariaMVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Contrato contrato)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                repo.Alta(contrato);
-                return RedirectToAction(nameof(Index));
-            }
-            catch(Exception ex)
-            {
-                ViewBag.Error = ex.Message;
                 ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
                 ViewBag.Inquilinos = repoInquilino.ObtenerTodos();
                 return View(contrato);
             }
+
+            bool disponible = repoContrato.InmuebleDisponible(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin);
+            if (!disponible)
+            {
+                ModelState.AddModelError("", "El inmueble ya está reservado o alquilado en esas fechas.");
+                ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
+                ViewBag.Inquilinos = repoInquilino.ObtenerTodos();
+                return View(contrato);
+            }
+
+            contrato.Estado = true;
+
+            repoContrato.Alta(contrato);
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Contratos/Edit/5
         public IActionResult Edit(int id)
         {
-            var contrato = repo.ObtenerPorId(id);
+            var contrato = repoContrato.ObtenerPorId(id);
             ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
             ViewBag.Inquilinos = repoInquilino.ObtenerTodos();
             return View(contrato);
@@ -77,10 +88,10 @@ namespace InmobiliariaMVC.Controllers
             try
             {
                 contrato.IdContrato = id;
-                repo.Modificacion(contrato);
+                repoContrato.Modificacion(contrato);
                 return RedirectToAction(nameof(Index));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
                 ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
@@ -92,7 +103,7 @@ namespace InmobiliariaMVC.Controllers
         // GET: Contratos/Delete/5
         public IActionResult Delete(int id)
         {
-            var contrato = repo.ObtenerPorId(id);
+            var contrato = repoContrato.ObtenerPorId(id);
             return View(contrato);
         }
 
@@ -103,14 +114,15 @@ namespace InmobiliariaMVC.Controllers
         {
             try
             {
-                repo.Baja(id);
+                repoContrato.Baja(id);
                 return RedirectToAction(nameof(Index));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
                 return View();
             }
         }
+
     }
 }

@@ -31,13 +31,12 @@ namespace InmobiliariaMVC.Models
         [Display(Name = "Precio Mensual")]
         public decimal PrecioMensual { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        [Display(Name = "Estado")]
-        public string Estado { get; set; } = string.Empty;  // <-- Agregado
+        [Display(Name = "Activo")]
+        public bool Estado { get; set; } = true; // Se crea como activo por defecto
 
-        // Propiedades de navegación (no se guardan en BD, pero ayudan en las vistas)
+        // Propiedades de navegación (solo para vistas)
         public Inmueble? Inmueble { get; set; }
         public Inquilino? Inquilino { get; set; }
+
     }
 }

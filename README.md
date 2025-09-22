@@ -31,3 +31,43 @@ propietario
 
 **dotnet aspnet-codegenerator controller -name InquilinosController -m Inquilino -dc ApplicationDbContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries --forced**
 
+
+
+
+**--------------------------------------------------------------------------------------------------------------------------------------**
+## 🚀 Tecnologías utilizadas
+- **C# .NET 8** (ASP.NET MVC)
+- **ADO.NET** con `MySqlConnector` (sin Entity Framework)
+- **MySQL** como base de datos
+- **Bootstrap 5** para el diseño de las vistas
+- Arquitectura **MVC** (Modelos, Vistas, Controladores)
+
+# En una primera etapa el proyecto fue desarrollado utilizando Entity Framework Core, con el que se implementaron dos módulos de ABM.
+# Posteriormente se cambio a ado.net por requerimiento academico, y mis disculpas por no prestar atenciony hacerlo asi del principio
+
+**PARA REALIZAR ESTE CAMBIO FUE NECESARIO**
+
+- Eliminar todas las declaraciones y configuraciones asociadas a Entity Framework Core.
+
+- Reestructurar los modelos de datos y la capa de acceso a datos para trabajar directamente con ADO.NET (SqlConnection, SqlCommand,         SqlDataReader, etc.).
+
+- Reescribir los ABM ya implementados y continuar con el resto de funcionalidades bajo el nuevo esquema.
+
+## 🔑 Funcionalidades principales
+- Gestión de **Inmuebles** (ABM).
+- Gestión de **Inquilinos** (ABM).
+- Gestión de **Contratos** (ABM).
+- Gestión de **Pagos** asociados a los contratos(ABM). parcial(proxima entrega terminado)
+- Validaciones de formularios en servidor y cliente.
+- Interfaz intuitiva y responsive con Bootstrap.
+
+
+Proximas mejoras a implementar
+
+Inmueble:
+atibutos uso-tipo, hacerlos enum y usar
+uso: habitacional, comercial, industrail, agropecuario
+tipo: terreno, construccion, residencial
+
+Atributo Superficie, avisar que es en m2
+

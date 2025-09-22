@@ -8,16 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// --- AQUÍ ESTÁ LA MAGIA ---
-// 1. Creamos UNA SOLA instancia de Database para toda la aplicación.
+// 1 sola instancia global de database
 builder.Services.AddSingleton(new Database(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Le decimos al sistema cómo crear cada repositorio cuando un controlador lo pida.
+// esto es para que los repos puedan ser usados por los controladores
 builder.Services.AddTransient<RepositorioInquilino>();
 builder.Services.AddTransient<RepositorioPropietario>();
 builder.Services.AddTransient<RepositorioInmueble>();
 builder.Services.AddTransient<RepositorioContrato>();
-// --- FIN DE LA MAGIA ---
+builder.Services.AddTransient<RepositorioPago>();
 
 var app = builder.Build();
 

@@ -33,7 +33,7 @@ namespace InmobiliariaMVC.Repositories
                     FechaInicio = reader.GetDateTime("FechaInicio"),
                     FechaFin = reader.GetDateTime("FechaFin"),
                     PrecioMensual = reader.GetDecimal("PrecioMensual"),
-                    Estado = reader.GetString("Estado"),
+                    Estado = reader.GetBoolean("Estado"),
                     Inmueble = new Inmueble
                     {
                         IdInmueble = reader.GetInt32("IdInmueble"),
@@ -74,7 +74,7 @@ namespace InmobiliariaMVC.Repositories
                     FechaInicio = reader.GetDateTime("FechaInicio"),
                     FechaFin = reader.GetDateTime("FechaFin"),
                     PrecioMensual = reader.GetDecimal("PrecioMensual"),
-                    Estado = reader.GetString("Estado"),
+                    Estado = reader.GetBoolean("Estado"),
                     Inmueble = new Inmueble
                     {
                         IdInmueble = reader.GetInt32("IdInmueble"),
@@ -138,5 +138,24 @@ namespace InmobiliariaMVC.Repositories
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
+        public bool InmuebleDisponible(int idInmueble, DateTime fechaInicio, DateTime fechaFin)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+            var query = @"SELECT COUNT(*) 
+                  FROM Contratos 
+                  WHERE IdInmueble = @idInmueble
+                  AND (
+                        (FechaInicio <= @fechaFin AND FechaFin >= @fechaInicio)
+                      )";
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@idInmueble", idInmueble);
+            cmd.Parameters.AddWithValue("@fechaInicio", fechaInicio);
+            cmd.Parameters.AddWithValue("@fechaFin", fechaFin);
+
+            var count = Convert.ToInt32(cmd.ExecuteScalar());
+            return count == 0; // true si está libre
+        }
+
     }
 }

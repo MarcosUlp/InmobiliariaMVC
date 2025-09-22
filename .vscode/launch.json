@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "InmobiliariaMVC",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/InmobiliariaMVC/bin/Debug/net8.0/InmobiliariaMVC.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/InmobiliariaMVC",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/InmobiliariaMVC/Views"
+      }
+    }
+  ]
+}

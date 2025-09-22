@@ -1,0 +1,35 @@
+@model IEnumerable<InmobiliariaMVC.Models.Pago>
+
+<h2>Pagos</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Pago</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Contrato</th>
+            <th>Fecha</th>
+            <th>Monto</th>
+            <th>Observaciones</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Contrato?.IdContrato</td>
+            <td>@item.FechaPago.ToShortDateString()</td>
+            <td>@item.Monto</td>
+            <td>@item.Observaciones</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.IdPago">Detalles</a> |
+                <a asp-action="Edit" asp-route-id="@item.IdPago">Editar</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdPago">Eliminar</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

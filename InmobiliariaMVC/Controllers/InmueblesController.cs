@@ -12,29 +12,29 @@ namespace InmobiliariaMVC.Controllers
     public class InmueblesController : Controller
     {
         // Declaramos los repositorios que vamos a usar
-        private readonly RepositorioInmueble repo;
+        private readonly RepositorioInmueble repoInmueble;
         private readonly RepositorioPropietario repoPropietario;
 
         // ¡ESTE ES EL GRAN CAMBIO!
         // El constructor ahora RECIBE los repositorios que necesita.
         // Ya no usa "new".
-        public InmueblesController(RepositorioInmueble repo, RepositorioPropietario repoPropietario)
+        public InmueblesController(RepositorioInmueble repoInmueble, RepositorioPropietario repoPropietario)
         {
-            this.repo = repo;
+            this.repoInmueble = repoInmueble;
             this.repoPropietario = repoPropietario;
         }
 
         // GET: InmueblesController
         public ActionResult Index()
         {
-            var lista = repo.ObtenerTodos();
+            var lista = repoInmueble.ObtenerTodos();
             return View(lista);
         }
 
         // GET: InmueblesController/Details/5
         public ActionResult Details(int id)
         {
-            var inmueble = repo.ObtenerPorId(id);
+            var inmueble = repoInmueble.ObtenerPorId(id);
             return View(inmueble);
         }
 
@@ -52,10 +52,10 @@ namespace InmobiliariaMVC.Controllers
         {
             try
             {
-                repo.Alta(inmueble);
+                repoInmueble.Alta(inmueble);
                 return RedirectToAction(nameof(Index));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
                 ViewBag.Propietarios = repoPropietario.ObtenerTodos();
@@ -66,7 +66,7 @@ namespace InmobiliariaMVC.Controllers
         // GET: InmueblesController/Edit/5
         public ActionResult Edit(int id)
         {
-            var inmueble = repo.ObtenerPorId(id);
+            var inmueble = repoInmueble.ObtenerPorId(id);
             ViewBag.Propietarios = repoPropietario.ObtenerTodos();
             return View(inmueble);
         }
@@ -79,10 +79,10 @@ namespace InmobiliariaMVC.Controllers
             try
             {
                 inmueble.IdInmueble = id;
-                repo.Modificacion(inmueble);
+                repoInmueble.Modificacion(inmueble);
                 return RedirectToAction(nameof(Index));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
                 ViewBag.Propietarios = repoPropietario.ObtenerTodos();
@@ -93,7 +93,7 @@ namespace InmobiliariaMVC.Controllers
         // GET: InmueblesController/Delete/5
         public ActionResult Delete(int id)
         {
-            var inmueble = repo.ObtenerPorId(id);
+            var inmueble = repoInmueble.ObtenerPorId(id);
             return View(inmueble);
         }
 
@@ -104,14 +104,24 @@ namespace InmobiliariaMVC.Controllers
         {
             try
             {
-                repo.Baja(id);
+                repoInmueble.Baja(id);
                 return RedirectToAction(nameof(Index));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                 ViewBag.Error = ex.Message;
-                 return View();
+                ViewBag.Error = ex.Message;
+                return View();
             }
         }
+        [HttpGet]
+        public IActionResult GetPrecio(int id)
+        {
+            var inmueble = repoInmueble.ObtenerPorId(id);
+            if (inmueble == null)
+                return NotFound();
+
+            return Json(new { precio = inmueble.Precio });
+        }
+
     }
 }
