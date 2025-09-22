@@ -1,4 +1,4 @@
-- Instalacion de framework .Net core
+<!--- Instalacion de framework .Net core
 - extencion de **C#** para desarrollo en VScode
 
 - ejecucion en la terminal del proyecto: **dotnet new mvc -n Inmobiliaria** (inicializa el proyecto y crea la estructura base)
@@ -31,7 +31,7 @@ propietario
 
 **dotnet aspnet-codegenerator controller -name InquilinosController -m Inquilino -dc ApplicationDbContext --relativeFolderPath Controllers --useDefaultLayout --referenceScriptLibraries --forced**
 
-
+-->
 
 
 **--------------------------------------------------------------------------------------------------------------------------------------**
