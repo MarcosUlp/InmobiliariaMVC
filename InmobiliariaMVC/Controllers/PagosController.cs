@@ -61,9 +61,15 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Pagos/Edit/5
+        // GET: Pagos/Edit/5
         public IActionResult Edit(int id)
         {
             var pago = repoPago.ObtenerPorId(id);
+            if (pago == null) return NotFound();
+
+            // cargar lista de contratos para el select
+            ViewBag.Contratos = repoContrato.ObtenerTodos();
+
             return View(pago);
         }
 
@@ -81,9 +87,14 @@ namespace InmobiliariaMVC.Controllers
             catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
+
+                // ⚠️ volver a cargar contratos si algo falla
+                ViewBag.Contratos = repoContrato.ObtenerTodos();
+
                 return View(pago);
             }
         }
+
 
         // GET: Pagos/Delete/5
         public IActionResult Delete(int id)

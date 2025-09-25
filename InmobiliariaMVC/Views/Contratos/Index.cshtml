@@ -2,18 +2,23 @@
 
 @{
     ViewData["Title"] = "Contratos";
+    bool estadoActual = ViewBag.EstadoActual ?? true;
 }
 
-<h1>Listado de Contratos</h1>
+<h1>Listado de Contratos (@(estadoActual ? "Activos" : "Inactivos"))</h1>
 
 <p>
     <a asp-action="Create" class="btn btn-primary">Crear Nuevo Contrato</a>
 </p>
 
+<div class="mb-3">
+    <a asp-action="Index" asp-route-estado="true" class="btn btn-success">Ver Activos</a>
+    <a asp-action="Index" asp-route-estado="false" class="btn btn-secondary">Ver Inactivos</a>
+</div>
+
 <table class="table">
     <thead>
         <tr>
-            <th>Código</th>
             <th>Inmueble</th>
             <th>Inquilino</th>
             <th>Fecha Inicio</th>
@@ -26,13 +31,12 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>@item.IdContrato</td>
             <td>@item.Inmueble.Direccion</td>
             <td>@item.Inquilino.Nombre @item.Inquilino.Apellido</td>
             <td>@item.FechaInicio.ToShortDateString()</td>
             <td>@item.FechaFin.ToShortDateString()</td>
             <td>@item.PrecioMensual</td>
-            <td>@item.Estado</td>
+            <td>@(item.Estado ? "Activo" : "Inactivo")</td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.IdContrato">Editar</a> |
                 <a asp-action="Details" asp-route-id="@item.IdContrato">Detalles</a> |

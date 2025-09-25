@@ -22,6 +22,7 @@ namespace InmobiliariaMVC.Models
         public string Dni { get; set; } = string.Empty; // Valor inicial
 
         public string Telefono { get; set; } = string.Empty; // Valor inicial
+        public bool Estado { get; set; }
 
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty; // Valor inicial

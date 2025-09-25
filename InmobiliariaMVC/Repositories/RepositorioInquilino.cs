@@ -11,27 +11,29 @@ namespace InmobiliariaMVC.Repositories
         private readonly Database _db;
         public RepositorioInquilino(Database db) => _db = db;
 
-        public List<Inquilino> ObtenerTodos()
+       public List<Inquilino> ObtenerTodos()
+{
+    var lista = new List<Inquilino>();
+    using var conn = _db.GetConnection();
+    var sql = "SELECT * FROM Inquilinos WHERE Estado = 1";
+    using var cmd = new MySqlCommand(sql, conn);
+    conn.Open();
+    using var reader = cmd.ExecuteReader();
+    while (reader.Read())
+    {
+        lista.Add(new Inquilino
         {
-            var lista = new List<Inquilino>();
-            using var conn = _db.GetConnection();
-            conn.Open();
-            var cmd = new MySqlCommand("SELECT * FROM Inquilinos", conn);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                lista.Add(new Inquilino
-                {
-                    IdInquilino = reader.GetInt32("IdInquilino"),
-                    Nombre = reader.GetString("Nombre"),
-                    Apellido = reader.GetString("Apellido"),
-                    Dni = reader.GetString("Dni"),
-                    Telefono = reader.IsDBNull(reader.GetOrdinal("Telefono")) ? "" : reader.GetString("Telefono"),
-                    Email = reader.GetString("Email")
-                });
-            }
-            return lista;
-        }
+            IdInquilino = reader.GetInt32("IdInquilino"),
+            Nombre = reader.GetString("Nombre"),
+            Apellido = reader.GetString("Apellido"),
+            Dni = reader.GetString("Dni"),
+            Telefono = reader.GetString("Telefono"),
+            Email = reader.GetString("Email"),
+            Estado = reader.GetBoolean("Estado")
+        });
+    }
+    return lista;
+}
 
         public Inquilino? ObtenerPorId(int id)
         {
@@ -90,7 +92,7 @@ namespace InmobiliariaMVC.Repositories
         {
             using var conn = _db.GetConnection();
             conn.Open();
-            var cmd = new MySqlCommand("DELETE FROM Inquilinos WHERE IdInquilino=@id", conn);
+            var cmd = new MySqlCommand("UPDATE Inquilinos SET Estado = 0 WHERE IdInquilino=@id", conn);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }

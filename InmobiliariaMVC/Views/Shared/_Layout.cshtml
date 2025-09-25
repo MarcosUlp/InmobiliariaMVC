@@ -32,22 +32,19 @@
                                 asp-action="Index">Inmuebles</a>
                         </li>-->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Inquilinos" asp-action="Index">Inquilinos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Inquilinos" asp-action="Index">Inquilinos</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Propietarios" asp-action="Index">Propietarios</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Propietarios" asp-action="Index">Propietarios</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Inmuebles" asp-action="Index">Inmuebles</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Inmuebles" asp-action="Index">Inmuebles</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Contratos" asp-action="Index">Contratos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Contratos" asp-action="Index">Contratos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Pagos" asp-action="Index">Pagos</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Pagos" asp-action="Index">Pagos</a>
                         </li>
 
                         @if (User.IsInRole("Administrador"))
@@ -58,7 +55,7 @@
                         }
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Usuarios" asp-action="Logout">Cerrar sesión</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Logout">Cerrar sesión</a>
                         </li>
                     </ul>
                 </div>

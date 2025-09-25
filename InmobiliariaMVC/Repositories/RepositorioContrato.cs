@@ -17,12 +17,56 @@ namespace InmobiliariaMVC.Repositories
             conn.Open();
 
             string sql = @"SELECT c.*, i.Direccion, inq.Nombre, inq.Apellido
-                           FROM Contratos c
-                           JOIN Inmuebles i ON c.IdInmueble = i.IdInmueble
-                           JOIN Inquilinos inq ON c.IdInquilino = inq.IdInquilino";
+               FROM Contratos c
+               JOIN Inmuebles i ON c.IdInmueble = i.IdInmueble
+               JOIN Inquilinos inq ON c.IdInquilino = inq.IdInquilino
+               ORDER BY c.IdContrato DESC"; // <- DESC para descendente
 
             using var cmd = new MySqlCommand(sql, conn);
             using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Contrato
+                {
+                    IdContrato = reader.GetInt32("IdContrato"),
+                    IdInmueble = reader.GetInt32("IdInmueble"),
+                    IdInquilino = reader.GetInt32("IdInquilino"),
+                    FechaInicio = reader.GetDateTime("FechaInicio"),
+                    FechaFin = reader.GetDateTime("FechaFin"),
+                    PrecioMensual = reader.GetDecimal("PrecioMensual"),
+                    Estado = reader.GetBoolean("Estado"),
+                    Inmueble = new Inmueble
+                    {
+                        IdInmueble = reader.GetInt32("IdInmueble"),
+                        Direccion = reader.GetString("Direccion")
+                    },
+                    Inquilino = new Inquilino
+                    {
+                        IdInquilino = reader.GetInt32("IdInquilino"),
+                        Nombre = reader.GetString("Nombre"),
+                        Apellido = reader.GetString("Apellido")
+                    }
+                });
+            }
+            return lista;
+        }
+        public List<Contrato> ObtenerPorEstado(bool estado)
+        {
+            var lista = new List<Contrato>();
+            using var conn = _db.GetConnection();
+            conn.Open();
+
+            string sql = @"SELECT c.*, i.Direccion, inq.Nombre, inq.Apellido
+                   FROM Contratos c
+                   JOIN Inmuebles i ON c.IdInmueble = i.IdInmueble
+                   JOIN Inquilinos inq ON c.IdInquilino = inq.IdInquilino
+                   WHERE c.Estado = @estado
+                   ORDER BY c.IdContrato DESC";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@estado", estado);
+            using var reader = cmd.ExecuteReader();
+
             while (reader.Read())
             {
                 lista.Add(new Contrato
@@ -134,8 +178,7 @@ namespace InmobiliariaMVC.Repositories
         {
             using var conn = _db.GetConnection();
             conn.Open();
-            var cmd = new MySqlCommand("DELETE FROM Contratos WHERE IdContrato=@id", conn);
-            cmd.Parameters.AddWithValue("@id", id);
+            var cmd = new MySqlCommand("UPDATE Contratos SET Estado=0 WHERE IdContrato=@id", conn); cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
         public bool InmuebleDisponible(int idInmueble, DateTime fechaInicio, DateTime fechaFin)

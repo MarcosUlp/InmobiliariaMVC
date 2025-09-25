@@ -21,11 +21,13 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Contratos
-        public IActionResult Index()
+        public IActionResult Index(bool estado = true)
         {
-            var lista = repoContrato.ObtenerTodos();
+            var lista = repoContrato.ObtenerPorEstado(estado);
+            ViewBag.EstadoActual = estado;
             return View(lista);
         }
+
 
         // GET: Contratos/Details/5
         public IActionResult Details(int id)

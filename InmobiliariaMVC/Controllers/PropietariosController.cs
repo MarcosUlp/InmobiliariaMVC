@@ -16,14 +16,12 @@ namespace InmobiliariaMVC.Controllers
             _repo = repo;
         }
 
-        // GET: Propietarios
         public IActionResult Index()
         {
             var lista = _repo.ObtenerTodos();
             return View(lista);
         }
 
-        // GET: Propietarios/Details/5
         public IActionResult Details(int? id)
         {
             if (id == null) return NotFound();
@@ -34,16 +32,14 @@ namespace InmobiliariaMVC.Controllers
             return View(propietario);
         }
 
-        // GET: Propietarios/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Propietarios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Nombre,Apellido,Dni,Telefono,Email,Clave")] Propietario propietario)
+        public IActionResult Create([Bind("Nombre,Apellido,Dni,Telefono,Email")] Propietario propietario)
         {
             if (ModelState.IsValid)
             {
@@ -60,7 +56,6 @@ namespace InmobiliariaMVC.Controllers
             return View(propietario);
         }
 
-        // GET: Propietarios/Edit/5
         public IActionResult Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -71,10 +66,9 @@ namespace InmobiliariaMVC.Controllers
             return View(propietario);
         }
 
-        // POST: Propietarios/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("IdPropietario,Nombre,Apellido,Dni,Telefono,Email,Clave")] Propietario propietario)
+        public IActionResult Edit(int id, [Bind("IdPropietario,Nombre,Apellido,Dni,Telefono,Email")] Propietario propietario)
         {
             if (id != propietario.IdPropietario) return NotFound();
 
@@ -101,6 +95,10 @@ namespace InmobiliariaMVC.Controllers
             var propietario = _repo.ObtenerPorId(id.Value);
             if (propietario == null) return NotFound();
 
+            // Revisar si tiene inmuebles con contratos activos
+            bool tieneContratosActivos = _repo.TieneInmueblesConContratosActivos(id.Value);
+            ViewBag.TieneContratosActivos = tieneContratosActivos;
+
             return View(propietario);
         }
 
@@ -109,22 +107,18 @@ namespace InmobiliariaMVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            try
+            bool tieneContratosActivos = _repo.TieneInmueblesConContratosActivos(id);
+            if (tieneContratosActivos)
             {
-                _repo.Eliminar(id);
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", "Error al eliminar propietario: " + ex.Message);
                 var propietario = _repo.ObtenerPorId(id);
+                ModelState.AddModelError("", "No se puede dar de baja al propietario porque tiene inmuebles con contratos activos.");
+                ViewBag.TieneContratosActivos = true;
                 return View(propietario);
             }
+
+            _repo.Eliminar(id);
+            return RedirectToAction(nameof(Index));
         }
 
-        private bool PropietarioExists(int id)
-        {
-            return _repo.ObtenerPorId(id) != null;
-        }
     }
 }

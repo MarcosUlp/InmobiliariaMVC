@@ -35,14 +35,22 @@ public class UsuariosController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> Login(string email, string password)
     {
+        // Validación rápida: email o password vacíos
+        if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+        {
+            ViewBag.Error = "Debe ingresar email y contraseña.";
+            return View();
+        }
+
         var usuario = repo.ObtenerPorEmail(email);
+
         if (usuario != null && BCrypt.Net.BCrypt.Verify(password, usuario.ClaveHash))
         {
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, usuario.Email),
-                new Claim(ClaimTypes.Role, usuario.Rol)
-            };
+        {
+            new Claim(ClaimTypes.Name, usuario.Email),
+            new Claim(ClaimTypes.Role, usuario.Rol)
+        };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -53,9 +61,10 @@ public class UsuariosController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        ViewBag.Error = "Credenciales incorrectas";
+        ViewBag.Error = "Credenciales incorrectas.";
         return View();
     }
+
 
     // GET: /Usuarios/Logout
     [Authorize]
