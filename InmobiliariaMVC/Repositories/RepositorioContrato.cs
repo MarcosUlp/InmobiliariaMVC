@@ -156,6 +156,55 @@ namespace InmobiliariaMVC.Repositories
             var count = Convert.ToInt32(cmd.ExecuteScalar());
             return count == 0; // true si está libre
         }
+        public IList<Contrato> ObtenerPorDniInquilino(string dni)
+        {
+            var lista = new List<Contrato>();
+            using var conn = _db.GetConnection();
+            conn.Open();
+
+            string sql = @"SELECT c.IdContrato, c.IdInquilino, c.IdInmueble, c.FechaInicio, c.FechaFin,
+                          c.PrecioMensual, c.Estado,
+                          inq.Nombre, inq.Apellido, inq.DNI,
+                          inm.Direccion
+                   FROM Contratos c
+                   JOIN Inquilinos inq ON c.IdInquilino = inq.IdInquilino
+                   JOIN Inmuebles inm ON c.IdInmueble = inm.IdInmueble
+                   WHERE inq.DNI = @dni";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@dni", dni);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var contrato = new Contrato
+                {
+                    IdContrato = reader.GetInt32("IdContrato"),
+                    IdInquilino = reader.GetInt32("IdInquilino"),
+                    IdInmueble = reader.GetInt32("IdInmueble"),
+                    FechaInicio = reader.GetDateTime("FechaInicio"),
+                    FechaFin = reader.GetDateTime("FechaFin"),
+                    PrecioMensual = reader.GetDecimal("PrecioMensual"),
+                    Estado = reader.GetBoolean("Estado"),
+                    Inquilino = new Inquilino
+                    {
+                        IdInquilino = reader.GetInt32("IdInquilino"),
+                        Nombre = reader.GetString("Nombre"),
+                        Apellido = reader.GetString("Apellido"),
+                        Dni = reader.GetString("DNI")
+                    },
+                    Inmueble = new Inmueble
+                    {
+                        IdInmueble = reader.GetInt32("IdInmueble"),
+                        Direccion = reader.GetString("Direccion")
+                    }
+                };
+                lista.Add(contrato);
+            }
+            return lista;
+        }
+
 
     }
+
 }

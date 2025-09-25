@@ -1,0 +1,21 @@
+@model InmobiliariaMVC.Models.Usuario
+
+@{
+    ViewData["Title"] = "Detalle de Usuario";
+}
+
+<h2>Detalle de Usuario</h2>
+
+<div class="card">
+    <div class="card-body">
+        <p><strong>Nombre:</strong> @Model.Nombre</p>
+        <p><strong>Apellido:</strong> @Model.Apellido</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Rol:</strong> @Model.Rol</p>
+        <p><strong>Avatar:</strong> @Model.Avatar ?? "Sin avatar"</p>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Volver al listado</a>
+<a asp-action="Edit" asp-route-id="@Model.IdUsuario" class="btn btn-primary mt-3">Editar</a>
+<a asp-action="Delete" asp-route-id="@Model.IdUsuario" class="btn btn-danger mt-3">Eliminar</a>

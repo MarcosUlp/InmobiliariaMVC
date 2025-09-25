@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 using InmobiliariaMVC.Models;
 // Asegúrate de que el namespace coincida con tu estructura de carpetas (PascalCase es la convención)
-using InmobiliariaMVC.Repositories; 
+using InmobiliariaMVC.Repositories;
 
 namespace InmobiliariaMVC.Controllers
 {
+    [Authorize]
     public class InquilinosController : Controller
     {
         private readonly RepositorioInquilino _repo;
@@ -99,7 +101,7 @@ namespace InmobiliariaMVC.Controllers
                 if (ModelState.IsValid)
                 {
                     // La variable correcta es _repo (con guion bajo)
-                    _repo.Editar(inquilino); 
+                    _repo.Editar(inquilino);
                     return RedirectToAction(nameof(Index));
                 }
                 return View(inquilino);

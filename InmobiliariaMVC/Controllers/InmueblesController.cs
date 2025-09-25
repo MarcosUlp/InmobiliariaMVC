@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaMVC.Controllers
 {
+    [Authorize]
     public class InmueblesController : Controller
     {
         // Declaramos los repositorios que vamos a usar

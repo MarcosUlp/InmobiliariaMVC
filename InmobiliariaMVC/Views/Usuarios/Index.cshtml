@@ -1,0 +1,45 @@
+@model IEnumerable<InmobiliariaMVC.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<h2>Usuarios</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo usuario</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().Nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Apellido)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Email)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Rol)</th>
+            <th>@Html.DisplayNameFor(model => model.First().Avatar)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
+                <td>@Html.DisplayFor(modelItem => item.Apellido)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>@Html.DisplayFor(modelItem => item.Rol)</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.Avatar))
+                    {
+                        <img src="@item.Avatar" alt="Avatar" width="40" class="rounded-circle" />
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.IdUsuario" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

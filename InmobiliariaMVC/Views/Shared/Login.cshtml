@@ -1,0 +1,28 @@
+<h2>Iniciar Sesión</h2>
+
+<form asp-action="Login" method="post">
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control"/>
+    </div>
+    <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" name="password" class="form-control"/>
+    </div>
+    <button type="submit" class="btn btn-success">Ingresar</button>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<hr />
+
+<!-- Botón para crear un usuario -->
+<hr />
+
+<a asp-action="Create" asp-controller="Usuarios" class="btn btn-primary d-block">
+    Crear un nuevo usuario
+</a>
+

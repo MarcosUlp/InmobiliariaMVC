@@ -1,13 +1,14 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using InmobiliariaMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaMVC.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-
     public HomeController(ILogger<HomeController> logger)
     {
         _logger = logger;
@@ -28,4 +29,9 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+    public IActionResult AccesoDenegado()
+    {
+        return View();
+    }
+
 }

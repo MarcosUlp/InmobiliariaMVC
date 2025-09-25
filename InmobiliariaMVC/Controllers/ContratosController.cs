@@ -3,15 +3,16 @@ using InmobiliariaMVC.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace InmobiliariaMVC.Controllers
 {
+    [Authorize]
     public class ContratosController : Controller
     {
         private readonly RepositorioContrato repoContrato;
         private readonly RepositorioInquilino repoInquilino;
         private readonly RepositorioInmueble repoInmueble;
-
         public ContratosController(RepositorioContrato repoContrato, RepositorioInquilino repoInquilino, RepositorioInmueble repoInmueble)
         {
             this.repoContrato = repoContrato;

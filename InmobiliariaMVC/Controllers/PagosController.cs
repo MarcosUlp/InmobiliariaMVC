@@ -1,10 +1,12 @@
 using InmobiliariaMVC.Models;
 using InmobiliariaMVC.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System;
 
 namespace InmobiliariaMVC.Controllers
 {
+    [Authorize]
     public class PagosController : Controller
     {
         private readonly RepositorioPago repoPago;
@@ -33,8 +35,15 @@ namespace InmobiliariaMVC.Controllers
         // GET: Pagos/Create
         public IActionResult Create()
         {
-            ViewBag.Contratos = repoContrato.ObtenerTodos();
             return View();
+        }
+
+        // POST: Pagos/BuscarContratosPorDni
+        [HttpPost]
+        public IActionResult BuscarContratosPorDni(string dni)
+        {
+            var contratos = repoContrato.ObtenerPorDniInquilino(dni);
+            return PartialView("_ListaContratosPartial", contratos);
         }
 
         // POST: Pagos/Create
@@ -42,24 +51,19 @@ namespace InmobiliariaMVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Pago pago)
         {
-            try
+            if (ModelState.IsValid)
             {
+                pago.FechaPago = DateTime.Now; // 👈 se setea automático
                 repoPago.Alta(pago);
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
-                ViewBag.Error = ex.Message;
-                ViewBag.Contratos = repoContrato.ObtenerTodos();
-                return View(pago);
-            }
+            return View(pago);
         }
 
         // GET: Pagos/Edit/5
         public IActionResult Edit(int id)
         {
             var pago = repoPago.ObtenerPorId(id);
-            ViewBag.Contratos = repoContrato.ObtenerTodos();
             return View(pago);
         }
 
@@ -77,7 +81,6 @@ namespace InmobiliariaMVC.Controllers
             catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
-                ViewBag.Contratos = repoContrato.ObtenerTodos();
                 return View(pago);
             }
         }

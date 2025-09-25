@@ -1,23 +1,54 @@
 @model InmobiliariaMVC.Models.Pago
 
-<h2>Nuevo Pago</h2>
+<h2>Registrar Pago</h2>
 
-<form asp-action="Create">
+<form asp-action="Create" method="post">
     <div class="form-group">
-        <label asp-for="IdContrato"></label>
-        <select asp-for="IdContrato" class="form-control" asp-items="@(new SelectList(ViewBag.Contratos, "IdContrato", "IdContrato"))"></select>
+        <label for="dni">Buscar por DNI del Inquilino</label>
+        <input type="text" id="dni" name="dni" class="form-control" placeholder="Ingrese DNI" />
+        <button type="button" class="btn btn-primary mt-2" id="btnBuscar">Buscar Contratos</button>
     </div>
-    <div class="form-group">
-        <label asp-for="FechaPago"></label>
-        <input asp-for="FechaPago" class="form-control" />
+
+    <div id="contratosContainer" class="mt-3">
+        <!-- Aquí se va a renderizar la lista de contratos -->
     </div>
-    <div class="form-group">
+
+    <input type="hidden" asp-for="IdContrato" />
+
+    <div class="form-group mt-3">
         <label asp-for="Monto"></label>
         <input asp-for="Monto" class="form-control" />
     </div>
+
     <div class="form-group">
         <label asp-for="Observaciones"></label>
         <textarea asp-for="Observaciones" class="form-control"></textarea>
     </div>
-    <button type="submit" class="btn btn-success">Guardar</button>
+
+    <button type="submit" class="btn btn-success mt-3">Guardar Pago</button>
 </form>
+
+@section Scripts {
+    <script>
+        document.getElementById("btnBuscar").addEventListener("click", function () {
+            var dni = document.getElementById("dni").value;
+            fetch('/Pagos/BuscarContratosPorDni', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'dni=' + dni
+            })
+            .then(resp => resp.text())
+            .then(html => {
+                document.getElementById("contratosContainer").innerHTML = html;
+
+                // enganchar evento al seleccionar contrato
+                document.querySelectorAll(".btnSeleccionarContrato").forEach(btn => {
+                    btn.addEventListener("click", function () {
+                        document.querySelector("[name='IdContrato']").value = this.dataset.id;
+                        alert("Contrato seleccionado: " + this.dataset.id);
+                    });
+                });
+            });
+        });
+    </script>
+}
