@@ -32,11 +32,18 @@ namespace InmobiliariaMVC.Models
         public decimal PrecioMensual { get; set; }
 
         [Display(Name = "Activo")]
-        public bool Estado { get; set; } = true; // Se crea como activo por defecto
+        public bool Estado { get; set; } = true;
 
-        // Propiedades de navegación (solo para vistas)
+        // 🔹 Auditoría
+        public int CreadoPor { get; set; }
+        public DateTime FechaCreacion { get; set; }
+        public int? AnuladoPor { get; set; }
+        public DateTime? FechaAnulacion { get; set; }
+
+        // Relaciones
         public Inmueble? Inmueble { get; set; }
         public Inquilino? Inquilino { get; set; }
-
+        public Usuario? UsuarioCreador { get; set; }
+        public Usuario? UsuarioAnulador { get; set; }
     }
 }

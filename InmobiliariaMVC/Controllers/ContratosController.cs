@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+
 
 namespace InmobiliariaMVC.Controllers
 {
@@ -29,6 +31,14 @@ namespace InmobiliariaMVC.Controllers
             ViewBag.EstadoActual = estado;
             return View(lista);
         }
+        // GET: Contratos/Auditoria
+        [Authorize(Roles = "Administrador")]
+        public IActionResult Auditoria()
+        {
+            var lista = repoContrato.ObtenerTodos();
+            return View(lista);
+        }
+
 
         // GET: Contratos/Details/5
         public IActionResult Details(int id)
@@ -67,9 +77,14 @@ namespace InmobiliariaMVC.Controllers
             }
 
             contrato.Estado = true;
+            contrato.CreadoPor = int.Parse(User.FindFirstValue("IdUsuario")); // ✅ ahora sí
+                                                                              // contrato.FechaCreacion lo pone el NOW() del repo, podés sacarlo si querés
+
             repoContrato.Alta(contrato);
             return RedirectToAction(nameof(Index));
         }
+
+
 
         // GET: Contratos/Edit/5
         public IActionResult Edit(int id)
@@ -132,13 +147,14 @@ namespace InmobiliariaMVC.Controllers
 
         // POST: Contratos/Delete/5
         [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
+        [Authorize(Roles = "Administrador")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             try
             {
-                repoContrato.Baja(id);
+                int userId = int.Parse(User.FindFirstValue("IdUsuario"));
+                repoContrato.Baja(id, userId);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -147,5 +163,6 @@ namespace InmobiliariaMVC.Controllers
                 return View();
             }
         }
+
     }
 }

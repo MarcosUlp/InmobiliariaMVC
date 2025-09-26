@@ -1,0 +1,43 @@
+@model IEnumerable<InmobiliariaMVC.Models.Contrato>
+
+@{
+    ViewData["Title"] = "Auditoría de Contratos";
+}
+
+<h2>Auditoría de Contratos</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Precio</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Anulado Por</th>
+            <th>Fecha Anulación</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.IdContrato</td>
+                <td>@c.Inquilino?.Nombre @c.Inquilino?.Apellido</td>
+                <td>@c.Inmueble?.Direccion</td>
+                <td>@c.FechaInicio.ToShortDateString()</td>
+                <td>@c.FechaFin.ToShortDateString()</td>
+                <td>@c.PrecioMensual.ToString("C")</td>
+                <td>@(c.UsuarioCreador != null ? c.UsuarioCreador.Nombre + " " + c.UsuarioCreador.Apellido : "-")</td>
+                <td>@c.FechaCreacion.ToString("g")</td>
+                <td>@(c.UsuarioAnulador != null ? c.UsuarioAnulador.Nombre + " " + c.UsuarioAnulador.Apellido : "-")</td>
+                <td>@(c.FechaAnulacion.HasValue? c.FechaAnulacion.Value.ToString("g") : "-")</td>
+                <td>@(c.Estado ? "Activo" : "Anulado")</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -78,9 +78,24 @@
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="EditarPerfil">Mi
                                             Perfil</a></li>
+                                    @* Solo admins *@
+                                    @if (User.IsInRole("Administrador"))
+                                    {
+                                        <li>
+                                            <hr class="dropdown-divider" />
+                                        </li>
+                                        <li><a class="dropdown-item" asp-controller="Pagos" asp-action="Auditoria">Auditar
+                                                Pagos</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Contratos" asp-action="Auditoria">Auditar
+                                                Contratos</a></li>
+                                    }
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
                                     <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Logout">Cerrar
                                             sesión</a></li>
                                 </ul>
+
                             </li>
                         }
                     </ul>

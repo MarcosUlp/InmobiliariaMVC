@@ -16,11 +16,17 @@ namespace InmobiliariaMVC.Repositories
             using var conn = _db.GetConnection();
             conn.Open();
 
-            string sql = @"SELECT c.*, i.Direccion, inq.Nombre, inq.Apellido
+            string sql = @"SELECT c.*, 
+                      i.Direccion, 
+                      inq.Nombre AS NombreInq, inq.Apellido AS ApellidoInq,
+                      u.Nombre AS NombreCreador, u.Apellido AS ApellidoCreador,
+                      u2.Nombre AS NombreAnulador, u2.Apellido AS ApellidoAnulador
                FROM Contratos c
                JOIN Inmuebles i ON c.IdInmueble = i.IdInmueble
                JOIN Inquilinos inq ON c.IdInquilino = inq.IdInquilino
-               ORDER BY c.IdContrato DESC"; // <- DESC para descendente
+               LEFT JOIN Usuarios u ON c.CreadoPor = u.IdUsuario
+               LEFT JOIN Usuarios u2 ON c.AnuladoPor = u2.IdUsuario
+               ORDER BY c.IdContrato DESC";
 
             using var cmd = new MySqlCommand(sql, conn);
             using var reader = cmd.ExecuteReader();
@@ -35,6 +41,10 @@ namespace InmobiliariaMVC.Repositories
                     FechaFin = reader.GetDateTime("FechaFin"),
                     PrecioMensual = reader.GetDecimal("PrecioMensual"),
                     Estado = reader.GetBoolean("Estado"),
+                    CreadoPor = reader.GetInt32("CreadoPor"),
+                    FechaCreacion = reader.GetDateTime("FechaCreacion"),
+                    AnuladoPor = reader.IsDBNull(reader.GetOrdinal("AnuladoPor")) ? null : reader.GetInt32("AnuladoPor"),
+                    FechaAnulacion = reader.IsDBNull(reader.GetOrdinal("FechaAnulacion")) ? null : reader.GetDateTime("FechaAnulacion"),
                     Inmueble = new Inmueble
                     {
                         IdInmueble = reader.GetInt32("IdInmueble"),
@@ -43,13 +53,25 @@ namespace InmobiliariaMVC.Repositories
                     Inquilino = new Inquilino
                     {
                         IdInquilino = reader.GetInt32("IdInquilino"),
-                        Nombre = reader.GetString("Nombre"),
-                        Apellido = reader.GetString("Apellido")
+                        Nombre = reader.GetString("NombreInq"),
+                        Apellido = reader.GetString("ApellidoInq")
+                    },
+                    UsuarioCreador = new Usuario
+                    {
+                        Nombre = reader.IsDBNull(reader.GetOrdinal("NombreCreador")) ? "" : reader.GetString("NombreCreador"),
+                        Apellido = reader.IsDBNull(reader.GetOrdinal("ApellidoCreador")) ? "" : reader.GetString("ApellidoCreador")
+                    },
+                    UsuarioAnulador = new Usuario
+                    {
+                        Nombre = reader.IsDBNull(reader.GetOrdinal("NombreAnulador")) ? "" : reader.GetString("NombreAnulador"),
+                        Apellido = reader.IsDBNull(reader.GetOrdinal("ApellidoAnulador")) ? "" : reader.GetString("ApellidoAnulador")
                     }
                 });
+
             }
             return lista;
         }
+
         public List<Contrato> ObtenerPorEstado(bool estado)
         {
             var lista = new List<Contrato>();
@@ -139,18 +161,24 @@ namespace InmobiliariaMVC.Repositories
         {
             using var conn = _db.GetConnection();
             conn.Open();
-            var cmd = new MySqlCommand(@"INSERT INTO Contratos 
-                                         (IdInmueble, IdInquilino, FechaInicio, FechaFin, PrecioMensual, Estado) 
-                                         VALUES 
-                                         (@IdInmueble, @IdInquilino, @FechaInicio, @FechaFin, @PrecioMensual, @Estado)", conn);
+            var cmd = new MySqlCommand(@"
+        INSERT INTO Contratos 
+        (IdInmueble, IdInquilino, FechaInicio, FechaFin, PrecioMensual, Estado, CreadoPor, FechaCreacion) 
+        VALUES 
+        (@IdInmueble, @IdInquilino, @FechaInicio, @FechaFin, @PrecioMensual, @Estado, @CreadoPor, NOW())", conn);
+
             cmd.Parameters.AddWithValue("@IdInmueble", c.IdInmueble);
             cmd.Parameters.AddWithValue("@IdInquilino", c.IdInquilino);
             cmd.Parameters.AddWithValue("@FechaInicio", c.FechaInicio);
             cmd.Parameters.AddWithValue("@FechaFin", c.FechaFin);
             cmd.Parameters.AddWithValue("@PrecioMensual", c.PrecioMensual);
             cmd.Parameters.AddWithValue("@Estado", c.Estado);
+            cmd.Parameters.AddWithValue("@CreadoPor", c.CreadoPor);
+
             cmd.ExecuteNonQuery();
         }
+
+
 
         public void Modificacion(Contrato c)
         {
@@ -174,13 +202,18 @@ namespace InmobiliariaMVC.Repositories
             cmd.ExecuteNonQuery();
         }
 
-        public void Baja(int id)
+        public void Baja(int id, int anuladoPor)
         {
             using var conn = _db.GetConnection();
             conn.Open();
-            var cmd = new MySqlCommand("UPDATE Contratos SET Estado=0 WHERE IdContrato=@id", conn); cmd.Parameters.AddWithValue("@id", id);
+            var cmd = new MySqlCommand(@"UPDATE Contratos 
+                                 SET Estado = 0, AnuladoPor=@anuladoPor, FechaAnulacion=NOW() 
+                                 WHERE IdContrato=@id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Parameters.AddWithValue("@anuladoPor", anuladoPor);
             cmd.ExecuteNonQuery();
         }
+
         public bool InmuebleDisponible(int idInmueble, DateTime fechaInicio, DateTime fechaFin)
         {
             using var conn = _db.GetConnection();
