@@ -48,6 +48,24 @@ namespace InmobiliariaMVC.Controllers
             return PartialView("_ListaContratosPartial", contratos);
         }
 
+        // GET: Pagos/Auditoria
+        [Authorize(Roles = "Administrador")] // Solo admins pueden ver auditoría
+        public IActionResult Auditoria()
+        {
+            var lista = repoPago.ObtenerTodos(); // Trae todos los pagos, activos e inactivos
+                                                               // Para mostrar nombre completo de usuarios, cargamos aquí mismo
+            foreach (var pago in lista)
+            {
+                // Si hay CreadoPor
+                if (pago.CreadoPor.HasValue)
+                    pago.UsuarioCreacion = repoPago.ObtenerUsuario(pago.CreadoPor.Value);
+                // Si hay AnuladoPor
+                if (pago.AnuladoPor.HasValue)
+                    pago.UsuarioAnulacion = repoPago.ObtenerUsuario(pago.AnuladoPor.Value);
+            }
+            return View(lista);
+        }
+
         // POST: Pagos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -56,7 +74,8 @@ namespace InmobiliariaMVC.Controllers
             if (ModelState.IsValid)
             {
                 pago.FechaPago = DateTime.Now;
-                repoPago.Alta(pago);
+                int usuarioId = int.Parse(User.Claims.First(c => c.Type == "IdUsuario").Value);
+                repoPago.Alta(pago, usuarioId);
                 return RedirectToAction(nameof(Index));
             }
             return View(pago);
@@ -93,7 +112,6 @@ namespace InmobiliariaMVC.Controllers
 
         // GET: Pagos/Delete/5
         [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
-        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
         public IActionResult Delete(int id)
         {
             var pago = repoPago.ObtenerPorId(id);
@@ -106,9 +124,11 @@ namespace InmobiliariaMVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            repoPago.Eliminar(id); // ahora hace baja lógica
+            int usuarioId = int.Parse(User.Claims.First(c => c.Type == "IdUsuario").Value);
+            repoPago.Eliminar(id, usuarioId);
             return RedirectToAction(nameof(Index));
         }
+
 
     }
 }

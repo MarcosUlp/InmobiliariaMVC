@@ -1,0 +1,40 @@
+@model IEnumerable<InmobiliariaMVC.Models.Pago>
+@{
+    ViewBag.Title = "Auditoría de Pagos";
+}
+
+<h2>Auditoría de Pagos</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Contrato</th>
+            <th>Inquilino</th>
+            <th>Inmueble</th>
+            <th>Monto</th>
+            <th>Fecha de Pago</th>
+            <th>Creado Por</th>
+            <th>Fecha Creación</th>
+            <th>Anulado Por</th>
+            <th>Fecha Anulación</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var pago in Model)
+        {
+            <tr>
+                <td>@pago.Contrato?.IdContrato</td>
+                <td>@pago.Contrato?.Inquilino?.Nombre @pago.Contrato?.Inquilino?.Apellido</td>
+                <td>@pago.Contrato?.Inmueble?.Direccion</td>
+                <td>@pago.Monto.ToString("C")</td>
+                <td>@pago.FechaPago.ToString("dd/MM/yyyy")</td>
+                <td>@pago.UsuarioCreacion?.Nombre @pago.UsuarioCreacion?.Apellido</td>
+                <td>@pago.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@pago.UsuarioAnulacion?.Nombre @pago.UsuarioAnulacion?.Apellido</td>
+                <td>@pago.FechaAnulacion?.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@(pago.Estado ? "Activo" : "Anulado")</td>
+            </tr>
+        }
+    </tbody>
+</table>
