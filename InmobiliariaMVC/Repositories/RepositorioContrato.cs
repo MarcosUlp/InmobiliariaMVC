@@ -246,6 +246,33 @@ namespace InmobiliariaMVC.Repositories
             }
             return lista;
         }
+        public bool InmuebleDisponible(int idInmueble, DateTime fechaInicio, DateTime fechaFin, int? idContrato = null)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+
+            var query = @"SELECT COUNT(*) 
+                  FROM Contratos 
+                  WHERE IdInmueble = @idInmueble
+                  AND (
+                        (FechaInicio <= @fechaFin AND FechaFin >= @fechaInicio)
+                      )
+                  AND Estado = 1";
+
+            if (idContrato.HasValue)
+                query += " AND IdContrato <> @idContrato";
+
+            using var cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@idInmueble", idInmueble);
+            cmd.Parameters.AddWithValue("@fechaInicio", fechaInicio);
+            cmd.Parameters.AddWithValue("@fechaFin", fechaFin);
+            if (idContrato.HasValue)
+                cmd.Parameters.AddWithValue("@idContrato", idContrato.Value);
+
+            var count = Convert.ToInt32(cmd.ExecuteScalar());
+            return count == 0; // true si está libre
+        }
+
 
 
     }

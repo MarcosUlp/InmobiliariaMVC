@@ -2,14 +2,21 @@
 
 @{
     ViewData["Title"] = "Inmuebles";
+    bool disponibleActual = ViewBag.DisponibleActual ?? true;
 }
 
-<h1>Listado de Inmuebles</h1>
+<h1>Listado de Inmuebles (@(disponibleActual ? "Disponibles" : "No disponibles"))</h1>
 
 <p>
-    <a asp-action="Create">Crear Nuevo Inmueble</a>
+    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Inmueble</a>
 </p>
-<table class="table">
+
+<div class="mb-3">
+    <a asp-action="Index" asp-route-disponible="true" class="btn btn-success">Ver Disponibles</a>
+    <a asp-action="Index" asp-route-disponible="false" class="btn btn-secondary">Ver No Disponibles</a>
+</div>
+
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Dirección</th>
@@ -25,17 +32,17 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>@Html.DisplayFor(modelItem => item.Direccion)</td>
-            <td>@Html.DisplayFor(modelItem => item.Uso)</td>
-            <td>@Html.DisplayFor(modelItem => item.Tipo)</td>
-            <td>@Html.DisplayFor(modelItem => item.Ambientes)</td>
-            <td>@Html.DisplayFor(modelItem => item.Precio)</td>
+            <td>@item.Direccion</td>
+            <td>@item.Uso</td>
+            <td>@item.Tipo</td>
+            <td>@item.Ambientes</td>
+            <td>@item.Precio.ToString("C")</td>
             <td>@(item.Dueño.Nombre + " " + item.Dueño.Apellido)</td>
             <td>@(item.Disponible ? "Sí" : "No")</td>
             <td>
-                @Html.ActionLink("Editar", "Edit", new { id=item.IdInmueble }) |
-                @Html.ActionLink("Detalles", "Details", new { id=item.IdInmueble }) |
-                @Html.ActionLink("Eliminar", "Delete", new { id=item.IdInmueble })
+                <a asp-action="Edit" asp-route-id="@item.IdInmueble">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.IdInmueble">Detalles</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdInmueble">Eliminar</a>
             </td>
         </tr>
 }

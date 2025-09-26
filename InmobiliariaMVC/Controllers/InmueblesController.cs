@@ -26,12 +26,15 @@ namespace InmobiliariaMVC.Controllers
             this.repoPropietario = repoPropietario;
         }
 
-        // GET: InmueblesController
-        public ActionResult Index()
+        // GET: Inmuebles
+        public ActionResult Index(bool disponible = true)
         {
             var lista = repoInmueble.ObtenerTodos();
-            return View(lista);
+            var filtrados = lista.Where(i => i.Disponible == disponible).ToList();
+            ViewBag.DisponibleActual = disponible;
+            return View(filtrados);
         }
+
 
         // GET: InmueblesController/Details/5
         public ActionResult Details(int id)
@@ -106,15 +109,24 @@ namespace InmobiliariaMVC.Controllers
         {
             try
             {
-                repoInmueble.Baja(id);
+                bool exito = repoInmueble.BajaLogica(id);
+                if (!exito)
+                {
+                    ViewBag.Error = "No se puede dar de baja. Existen contratos activos asociados a este inmueble.";
+                    var inmueble = repoInmueble.ObtenerPorId(id);
+                    return View(inmueble);
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
-                return View();
+                var inmueble = repoInmueble.ObtenerPorId(id);
+                return View(inmueble);
             }
         }
+
         [HttpGet]
         public IActionResult GetPrecio(int id)
         {

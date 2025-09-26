@@ -42,22 +42,22 @@ namespace InmobiliariaMVC.Repositories
             }
             return lista;
         }
-        
+
         public Inmueble? ObtenerPorId(int id)
         {
-             Inmueble? inmueble = null;
-             using var connection = _db.GetConnection();
-             connection.Open();
-             string sql = @"SELECT i.*, p.Nombre, p.Apellido 
+            Inmueble? inmueble = null;
+            using var connection = _db.GetConnection();
+            connection.Open();
+            string sql = @"SELECT i.*, p.Nombre, p.Apellido 
                             FROM Inmuebles i JOIN Propietarios p ON i.IdPropietario = p.IdPropietario 
                             WHERE i.IdInmueble = @id";
-             using var command = new MySqlCommand(sql, connection);
-             command.Parameters.AddWithValue("@id", id);
-             using var reader = command.ExecuteReader();
-             if (reader.Read())
-             {
-                 inmueble = new Inmueble
-                 {
+            using var command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", id);
+            using var reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                inmueble = new Inmueble
+                {
                     IdInmueble = reader.GetInt32("IdInmueble"),
                     Direccion = reader.GetString("Direccion"),
                     Uso = reader.IsDBNull(reader.GetOrdinal("Uso")) ? null : reader.GetString("Uso"),
@@ -73,9 +73,9 @@ namespace InmobiliariaMVC.Repositories
                         Nombre = reader.GetString("Nombre"),
                         Apellido = reader.GetString("Apellido")
                     }
-                 };
-             }
-             return inmueble;
+                };
+            }
+            return inmueble;
         }
 
         public void Alta(Inmueble i)
@@ -121,5 +121,31 @@ namespace InmobiliariaMVC.Repositories
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
+        public bool BajaLogica(int id)
+        {
+            using var conn = _db.GetConnection();
+            conn.Open();
+
+            // 1. Verificar si hay contratos activos
+            var checkCmd = new MySqlCommand(@"SELECT COUNT(*) 
+                                      FROM Contratos 
+                                      WHERE IdInmueble = @id AND Estado = 1", conn);
+            checkCmd.Parameters.AddWithValue("@id", id);
+            var count = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+            if (count > 0)
+            {
+                // Hay contratos activos, no se puede dar de baja
+                return false;
+            }
+
+            // 2. Dar de baja lógica
+            var cmd = new MySqlCommand(@"UPDATE Inmuebles SET Disponible = 0 WHERE IdInmueble = @id", conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.ExecuteNonQuery();
+
+            return true;
+        }
+
     }
 }

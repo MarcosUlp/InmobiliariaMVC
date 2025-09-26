@@ -9,27 +9,29 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Contrato</th>
-            <th>Fecha</th>
+            <th>Dirección del Inmueble</th>
+            <th>Inquilino</th>
+            <th>Fecha de Pago</th>
             <th>Monto</th>
             <th>Observaciones</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.Contrato?.IdContrato</td>
-            <td>@item.FechaPago.ToShortDateString()</td>
-            <td>@item.Monto</td>
-            <td>@item.Observaciones</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.IdPago">Detalles</a> |
-                <a asp-action="Edit" asp-route-id="@item.IdPago">Editar</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdPago">Eliminar</a>
-            </td>
-        </tr>
-    }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Contrato?.Inmueble?.Direccion</td>
+                <td>@($"{item.Contrato?.Inquilino?.Nombre} {item.Contrato?.Inquilino?.Apellido}")</td>
+                <td>@item.FechaPago.ToShortDateString()</td>
+                <td>@item.Monto.ToString("C")</td>
+                <td>@item.Observaciones</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.IdPago">Detalles</a> |
+                    <a asp-action="Edit" asp-route-id="@item.IdPago">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdPago">Eliminar</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

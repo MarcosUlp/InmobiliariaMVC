@@ -14,7 +14,17 @@ namespace InmobiliariaMVC.Repositories
             var lista = new List<Pago>();
             using var conn = _db.GetConnection();
             conn.Open();
-            var cmd = new MySqlCommand("SELECT * FROM Pagos", conn);
+            var sql = @"
+        SELECT p.IdPago, p.IdContrato, p.FechaPago, p.Monto, p.Observaciones,
+               c.IdContrato AS ContratoId,
+               i.Nombre AS InquilinoNombre, i.Apellido AS InquilinoApellido,
+               m.Direccion AS InmuebleDireccion
+        FROM Pagos p
+        INNER JOIN Contratos c ON p.IdContrato = c.IdContrato
+        INNER JOIN Inquilinos i ON c.IdInquilino = i.IdInquilino
+        INNER JOIN Inmuebles m ON c.IdInmueble = m.IdInmueble
+        ORDER BY p.FechaPago DESC;";   // 👈 ya ordenado DESC
+            using var cmd = new MySqlCommand(sql, conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -24,11 +34,25 @@ namespace InmobiliariaMVC.Repositories
                     IdContrato = reader.GetInt32("IdContrato"),
                     FechaPago = reader.GetDateTime("FechaPago"),
                     Monto = reader.GetDecimal("Monto"),
-                    Observaciones = reader.IsDBNull(reader.GetOrdinal("Observaciones")) ? "" : reader.GetString("Observaciones")
+                    Observaciones = reader.IsDBNull(reader.GetOrdinal("Observaciones")) ? "" : reader.GetString("Observaciones"),
+                    Contrato = new Contrato
+                    {
+                        IdContrato = reader.GetInt32("ContratoId"),
+                        Inquilino = new Inquilino
+                        {
+                            Nombre = reader.GetString("InquilinoNombre"),
+                            Apellido = reader.GetString("InquilinoApellido")
+                        },
+                        Inmueble = new Inmueble
+                        {
+                            Direccion = reader.GetString("InmuebleDireccion")
+                        }
+                    }
                 });
             }
             return lista;
         }
+
 
         public Pago? ObtenerPorId(int id)
         {

@@ -88,6 +88,29 @@ namespace InmobiliariaMVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Contrato contrato)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
+                ViewBag.Inquilinos = repoInquilino.ObtenerTodos();
+                return View(contrato);
+            }
+
+            // Validación: que no se pise con otro contrato activo
+            bool disponible = repoContrato.InmuebleDisponible(
+                contrato.IdInmueble,
+                contrato.FechaInicio,
+                contrato.FechaFin,
+                id
+            );
+
+            if (!disponible)
+            {
+                ModelState.AddModelError("", "El inmueble ya está alquilado o reservado en esas fechas.");
+                ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
+                ViewBag.Inquilinos = repoInquilino.ObtenerTodos();
+                return View(contrato);
+            }
+
             try
             {
                 contrato.IdContrato = id;
@@ -102,6 +125,7 @@ namespace InmobiliariaMVC.Controllers
                 return View(contrato);
             }
         }
+
 
         // GET: Contratos/Delete/5
         public IActionResult Delete(int id)
