@@ -49,7 +49,10 @@ public class UsuariosController : Controller
             var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, usuario.Email),
-            new Claim(ClaimTypes.Role, usuario.Rol)
+            new Claim(ClaimTypes.Role, usuario.Rol),
+            new Claim("IdUsuario", usuario.IdUsuario.ToString()), // <-- importante
+            new Claim("NombreCompleto", $"{usuario.Nombre} {usuario.Apellido}"), // opcional
+            new Claim("Avatar", usuario.Avatar ?? "/img/default-avatar.png") // opcional
         };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -93,27 +96,63 @@ public class UsuariosController : Controller
     }
 
     // GET: /Usuarios/Edit/1
-    [AllowAnonymous]
-    public IActionResult Edit(int id)
+    [Authorize]
+    public IActionResult EditarPerfil()
     {
+        var id = int.Parse(User.Claims.First(c => c.Type == "IdUsuario").Value);
         var usuario = repo.ObtenerPorId(id);
         if (usuario == null) return NotFound();
         return View(usuario);
     }
 
-    // POST: /Usuarios/Edit/1
     [HttpPost]
-    [AllowAnonymous]
+    [Authorize]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(Usuario usuario, string password)
+    public IActionResult EditarPerfil(Usuario model, string? nuevaClave, IFormFile? nuevoAvatar, bool eliminarAvatar = false)
     {
-        if (!string.IsNullOrEmpty(password))
+        var id = int.Parse(User.Claims.First(c => c.Type == "IdUsuario").Value);
+        var usuario = repo.ObtenerPorId(id);
+
+        if (usuario == null) return NotFound();
+
+        usuario.Nombre = model.Nombre;
+        usuario.Apellido = model.Apellido;
+        usuario.Email = model.Email;
+
+        if (!string.IsNullOrEmpty(nuevaClave))
         {
-            usuario.ClaveHash = BCrypt.Net.BCrypt.HashPassword(password);
+            usuario.ClaveHash = BCrypt.Net.BCrypt.HashPassword(nuevaClave);
         }
+
+        if (nuevoAvatar != null)
+        {
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(nuevoAvatar.FileName)}";
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img");
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var filePath = Path.Combine(folderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                nuevoAvatar.CopyTo(stream);
+            }
+
+            usuario.Avatar = "/img/" + fileName;
+        }
+        else if (eliminarAvatar)
+        {
+            usuario.Avatar = "/img/default-avatar.png";
+        }
+
         repo.Modificar(usuario);
-        return RedirectToAction(nameof(Index));
+
+        TempData["Msg"] = "Perfil actualizado correctamente.";
+        return RedirectToAction("EditarPerfil");
     }
+
+
 
     // GET: /Usuarios/Delete/1
     [AllowAnonymous]

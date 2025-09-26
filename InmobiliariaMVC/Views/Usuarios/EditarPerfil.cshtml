@@ -1,0 +1,48 @@
+@model InmobiliariaMVC.Models.Usuario
+@{
+    ViewData["Title"] = "Editar Perfil";
+}
+
+<div class="card shadow-lg p-4 mx-auto" style="max-width: 600px;">
+    <div class="text-center">
+        <img src="@Url.Content(Model.Avatar ?? "~/img/default-avatar.png")" class="rounded-circle mb-3" width="120"
+            height="120" alt="avatar" />
+        <h3>@Model.Nombre @Model.Apellido</h3>
+        <p class="text-muted">@Model.Email</p>
+    </div>
+
+    <form asp-action="EditarPerfil" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input asp-for="Nombre" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Apellido</label>
+            <input asp-for="Apellido" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Nueva Contraseña</label>
+            <input type="password" name="nuevaClave" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Cambiar Avatar</label>
+            <input type="file" name="nuevoAvatar" class="form-control" />
+        </div>
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="eliminarAvatar" value="true" id="eliminarAvatar">
+            <label class="form-check-label" for="eliminarAvatar">
+                Eliminar avatar (usar por defecto)
+            </label>
+        </div>
+        <button type="submit" class="btn btn-success w-100">Guardar cambios</button>
+    </form>
+
+    @if (TempData["Msg"] != null)
+    {
+        <div class="alert alert-success mt-3">@TempData["Msg"]</div>
+    }
+</div>
