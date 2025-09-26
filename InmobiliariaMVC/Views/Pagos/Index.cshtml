@@ -1,10 +1,20 @@
 @model IEnumerable<InmobiliariaMVC.Models.Pago>
 
-<h2>Pagos</h2>
+@{
+    ViewData["Title"] = "Pagos";
+    bool activosActual = ViewBag.ActivosActual ?? true;
+}
+
+<h2>Pagos (@(activosActual ? "Activos" : "Anulados"))</h2>
 
 <p>
     <a asp-action="Create" class="btn btn-primary">Nuevo Pago</a>
 </p>
+
+<div class="mb-3">
+    <a asp-action="Index" asp-route-activos="true" class="btn btn-success">Ver Activos</a>
+    <a asp-action="Index" asp-route-activos="false" class="btn btn-secondary">Ver Anulados</a>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -18,20 +28,27 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Contrato?.Inmueble?.Direccion</td>
-                <td>@($"{item.Contrato?.Inquilino?.Nombre} {item.Contrato?.Inquilino?.Apellido}")</td>
-                <td>@item.FechaPago.ToShortDateString()</td>
-                <td>@item.Monto.ToString("C")</td>
-                <td>@item.Observaciones</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.IdPago">Detalles</a> |
-                    <a asp-action="Edit" asp-route-id="@item.IdPago">Editar</a> |
-                    <a asp-action="Delete" asp-route-id="@item.IdPago">Eliminar</a>
-                </td>
-            </tr>
-        }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Contrato?.Inmueble?.Direccion</td>
+            <td>@($"{item.Contrato?.Inquilino?.Nombre} {item.Contrato?.Inquilino?.Apellido}")</td>
+            <td>@item.FechaPago.ToShortDateString()</td>
+            <td>@item.Monto.ToString("C")</td>
+            <td>@item.Observaciones</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.IdPago">Detalles</a> |
+                <a asp-action="Edit" asp-route-id="@item.IdPago">Editar</a> |
+                @if (item.Estado)
+                {
+                    <a asp-action="Delete" asp-route-id="@item.IdPago" class="btn btn-sm btn-danger">Anular</a>
+                }
+                else
+                {
+                    <span class="text-muted">Anulado</span>
+                }
+            </td>
+        </tr>
+    }
     </tbody>
 </table>

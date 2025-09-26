@@ -17,7 +17,7 @@ public class UsuariosController : Controller
     }
 
     // GET: /Usuarios
-    [AllowAnonymous]
+    [Authorize(Roles = "Administrador")]
     public IActionResult Index()
     {
         return View(repo.ObtenerTodos());
@@ -25,17 +25,13 @@ public class UsuariosController : Controller
 
     // GET: /Usuarios/Login
     [AllowAnonymous]
-    public IActionResult Login()
-    {
-        return View();
-    }
+    public IActionResult Login() => View();
 
     // POST: /Usuarios/Login
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> Login(string email, string password)
     {
-        // Validación rápida: email o password vacíos
         if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
             ViewBag.Error = "Debe ingresar email y contraseña.";
@@ -47,19 +43,16 @@ public class UsuariosController : Controller
         if (usuario != null && BCrypt.Net.BCrypt.Verify(password, usuario.ClaveHash))
         {
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, usuario.Email),
-            new Claim(ClaimTypes.Role, usuario.Rol),
-            new Claim("IdUsuario", usuario.IdUsuario.ToString()), // <-- importante
-            new Claim("NombreCompleto", $"{usuario.Nombre} {usuario.Apellido}"), // opcional
-            new Claim("Avatar", usuario.Avatar ?? "/img/default-avatar.png") // opcional
-        };
+            {
+                new Claim(ClaimTypes.Name, usuario.Email),
+                new Claim(ClaimTypes.Role, usuario.Rol),
+                new Claim("IdUsuario", usuario.IdUsuario.ToString()),
+                new Claim("NombreCompleto", $"{usuario.Nombre} {usuario.Apellido}"),
+                new Claim("Avatar", usuario.Avatar ?? "/img/default-avatar.png")
+            };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity));
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
             return RedirectToAction("Index", "Home");
         }
@@ -67,7 +60,6 @@ public class UsuariosController : Controller
         ViewBag.Error = "Credenciales incorrectas.";
         return View();
     }
-
 
     // GET: /Usuarios/Logout
     [Authorize]
@@ -78,15 +70,12 @@ public class UsuariosController : Controller
     }
 
     // GET: /Usuarios/Create
-    [AllowAnonymous]
-    public IActionResult Create()
-    {
-        return View();
-    }
+    [Authorize(Roles = "Administrador")]
+    public IActionResult Create() => View();
 
     // POST: /Usuarios/Create
     [HttpPost]
-    [AllowAnonymous]
+    [Authorize(Roles = "Administrador")]
     [ValidateAntiForgeryToken]
     public IActionResult Create(Usuario usuario, string password)
     {
@@ -112,7 +101,6 @@ public class UsuariosController : Controller
     {
         var id = int.Parse(User.Claims.First(c => c.Type == "IdUsuario").Value);
         var usuario = repo.ObtenerPorId(id);
-
         if (usuario == null) return NotFound();
 
         usuario.Nombre = model.Nombre;
@@ -120,20 +108,16 @@ public class UsuariosController : Controller
         usuario.Email = model.Email;
 
         if (!string.IsNullOrEmpty(nuevaClave))
-        {
             usuario.ClaveHash = BCrypt.Net.BCrypt.HashPassword(nuevaClave);
-        }
 
         if (nuevoAvatar != null)
         {
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(nuevoAvatar.FileName)}";
             var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img");
-
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
             var filePath = Path.Combine(folderPath, fileName);
-
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 nuevoAvatar.CopyTo(stream);
@@ -147,15 +131,12 @@ public class UsuariosController : Controller
         }
 
         repo.Modificar(usuario);
-
         TempData["Msg"] = "Perfil actualizado correctamente.";
         return RedirectToAction("EditarPerfil");
     }
 
-
-
     // GET: /Usuarios/Delete/1
-    [AllowAnonymous]
+    [Authorize(Roles = "Administrador")]
     public IActionResult Delete(int id)
     {
         var usuario = repo.ObtenerPorId(id);
@@ -165,7 +146,7 @@ public class UsuariosController : Controller
 
     // POST: /Usuarios/Delete/1
     [HttpPost, ActionName("Delete")]
-    [AllowAnonymous]
+    [Authorize(Roles = "Administrador")]
     [ValidateAntiForgeryToken]
     public IActionResult DeleteConfirmed(int id)
     {

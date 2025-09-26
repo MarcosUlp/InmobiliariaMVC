@@ -4,15 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace InmobiliariaMVC.Controllers
 {
-    [Authorize]
+    [Authorize] // Todos deben estar logueados para acceder
     public class ContratosController : Controller
     {
         private readonly RepositorioContrato repoContrato;
         private readonly RepositorioInquilino repoInquilino;
         private readonly RepositorioInmueble repoInmueble;
+
         public ContratosController(RepositorioContrato repoContrato, RepositorioInquilino repoInquilino, RepositorioInmueble repoInmueble)
         {
             this.repoContrato = repoContrato;
@@ -28,7 +30,6 @@ namespace InmobiliariaMVC.Controllers
             return View(lista);
         }
 
-
         // GET: Contratos/Details/5
         public IActionResult Details(int id)
         {
@@ -37,8 +38,6 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Contratos/Create
-        // GET: Contratos/Create
-        [HttpGet]
         public IActionResult Create()
         {
             ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
@@ -68,9 +67,7 @@ namespace InmobiliariaMVC.Controllers
             }
 
             contrato.Estado = true;
-
             repoContrato.Alta(contrato);
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -95,7 +92,6 @@ namespace InmobiliariaMVC.Controllers
                 return View(contrato);
             }
 
-            // Validación: que no se pise con otro contrato activo
             bool disponible = repoContrato.InmuebleDisponible(
                 contrato.IdInmueble,
                 contrato.FechaInicio,
@@ -126,8 +122,8 @@ namespace InmobiliariaMVC.Controllers
             }
         }
 
-
         // GET: Contratos/Delete/5
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
         public IActionResult Delete(int id)
         {
             var contrato = repoContrato.ObtenerPorId(id);
@@ -135,9 +131,10 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // POST: Contratos/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id, IFormCollection collection)
+        public IActionResult DeleteConfirmed(int id)
         {
             try
             {
@@ -150,6 +147,5 @@ namespace InmobiliariaMVC.Controllers
                 return View();
             }
         }
-
     }
 }

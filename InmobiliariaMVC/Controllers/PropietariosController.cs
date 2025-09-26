@@ -6,7 +6,7 @@ using System;
 
 namespace InmobiliariaMVC.Controllers
 {
-    [Authorize]
+    [Authorize] // Todo el ABM requiere usuario logueado
     public class PropietariosController : Controller
     {
         private readonly RepositorioPropietario _repo;
@@ -88,6 +88,7 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Propietarios/Delete/5
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
         public IActionResult Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -95,7 +96,6 @@ namespace InmobiliariaMVC.Controllers
             var propietario = _repo.ObtenerPorId(id.Value);
             if (propietario == null) return NotFound();
 
-            // Revisar si tiene inmuebles con contratos activos
             bool tieneContratosActivos = _repo.TieneInmueblesConContratosActivos(id.Value);
             ViewBag.TieneContratosActivos = tieneContratosActivos;
 
@@ -104,6 +104,7 @@ namespace InmobiliariaMVC.Controllers
 
         // POST: Propietarios/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
@@ -119,6 +120,5 @@ namespace InmobiliariaMVC.Controllers
             _repo.Eliminar(id);
             return RedirectToAction(nameof(Index));
         }
-
     }
 }

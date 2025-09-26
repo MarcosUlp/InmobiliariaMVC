@@ -6,7 +6,7 @@ using System;
 
 namespace InmobiliariaMVC.Controllers
 {
-    [Authorize]
+    [Authorize] // Todos los ABM requieren usuario logueado
     public class PagosController : Controller
     {
         private readonly RepositorioPago repoPago;
@@ -19,11 +19,13 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Pagos
-        public IActionResult Index()
+        public IActionResult Index(bool activos = true)
         {
-            var lista = repoPago.ObtenerTodos();
+            var lista = repoPago.ObtenerTodos(activos);
+            ViewBag.ActivosActual = activos;
             return View(lista);
         }
+
 
         // GET: Pagos/Details/5
         public IActionResult Details(int id)
@@ -53,7 +55,7 @@ namespace InmobiliariaMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                pago.FechaPago = DateTime.Now; // 👈 se setea automático
+                pago.FechaPago = DateTime.Now;
                 repoPago.Alta(pago);
                 return RedirectToAction(nameof(Index));
             }
@@ -61,15 +63,12 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Pagos/Edit/5
-        // GET: Pagos/Edit/5
         public IActionResult Edit(int id)
         {
             var pago = repoPago.ObtenerPorId(id);
             if (pago == null) return NotFound();
 
-            // cargar lista de contratos para el select
             ViewBag.Contratos = repoContrato.ObtenerTodos();
-
             return View(pago);
         }
 
@@ -87,16 +86,14 @@ namespace InmobiliariaMVC.Controllers
             catch (Exception ex)
             {
                 ViewBag.Error = ex.Message;
-
-                // ⚠️ volver a cargar contratos si algo falla
                 ViewBag.Contratos = repoContrato.ObtenerTodos();
-
                 return View(pago);
             }
         }
 
-
         // GET: Pagos/Delete/5
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
         public IActionResult Delete(int id)
         {
             var pago = repoPago.ObtenerPorId(id);
@@ -104,20 +101,14 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // POST: Pagos/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id, IFormCollection collection)
+        public IActionResult DeleteConfirmed(int id)
         {
-            try
-            {
-                repoPago.Eliminar(id);
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Error = ex.Message;
-                return View();
-            }
+            repoPago.Eliminar(id); // ahora hace baja lógica
+            return RedirectToAction(nameof(Index));
         }
+
     }
 }

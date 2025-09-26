@@ -9,7 +9,7 @@ namespace InmobiliariaMVC.Repositories
         private readonly Database _db;
         public RepositorioPago(Database db) => _db = db;
 
-        public List<Pago> ObtenerTodos()
+        public List<Pago> ObtenerTodos(bool activos = true)
         {
             var lista = new List<Pago>();
             using var conn = _db.GetConnection();
@@ -18,13 +18,16 @@ namespace InmobiliariaMVC.Repositories
         SELECT p.IdPago, p.IdContrato, p.FechaPago, p.Monto, p.Observaciones,
                c.IdContrato AS ContratoId,
                i.Nombre AS InquilinoNombre, i.Apellido AS InquilinoApellido,
-               m.Direccion AS InmuebleDireccion
+               m.Direccion AS InmuebleDireccion,
+               p.Estado
         FROM Pagos p
         INNER JOIN Contratos c ON p.IdContrato = c.IdContrato
         INNER JOIN Inquilinos i ON c.IdInquilino = i.IdInquilino
         INNER JOIN Inmuebles m ON c.IdInmueble = m.IdInmueble
-        ORDER BY p.FechaPago DESC;";   // 👈 ya ordenado DESC
+        WHERE p.Estado = @estado
+        ORDER BY p.FechaPago DESC;";
             using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@estado", activos ? 1 : 0);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -35,6 +38,7 @@ namespace InmobiliariaMVC.Repositories
                     FechaPago = reader.GetDateTime("FechaPago"),
                     Monto = reader.GetDecimal("Monto"),
                     Observaciones = reader.IsDBNull(reader.GetOrdinal("Observaciones")) ? "" : reader.GetString("Observaciones"),
+                    Estado = reader.GetInt32("Estado") == 1,
                     Contrato = new Contrato
                     {
                         IdContrato = reader.GetInt32("ContratoId"),
@@ -52,6 +56,7 @@ namespace InmobiliariaMVC.Repositories
             }
             return lista;
         }
+
 
 
         public Pago? ObtenerPorId(int id)
@@ -110,9 +115,11 @@ namespace InmobiliariaMVC.Repositories
         {
             using var conn = _db.GetConnection();
             conn.Open();
-            var cmd = new MySqlCommand("DELETE FROM Pagos WHERE IdPago=@id", conn);
+            // Baja lógica: ponemos un campo "Activo" = 0 en lugar de eliminar
+            var cmd = new MySqlCommand("UPDATE Pagos SET Estado = 0 WHERE IdPago = @id", conn);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
+
     }
 }

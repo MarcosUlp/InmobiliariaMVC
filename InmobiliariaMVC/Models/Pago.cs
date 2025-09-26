@@ -16,7 +16,7 @@ namespace InmobiliariaMVC.Models
         [DataType(DataType.Date)]
         [Display(Name = "Fecha de Pago")]
         public DateTime FechaPago { get; set; }
-
+        public bool Estado { get; set; }
         [Required]
         [DataType(DataType.Currency)]
         public decimal Monto { get; set; }
