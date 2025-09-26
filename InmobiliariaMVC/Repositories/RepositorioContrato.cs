@@ -305,8 +305,47 @@ namespace InmobiliariaMVC.Repositories
             var count = Convert.ToInt32(cmd.ExecuteScalar());
             return count == 0; // true si está libre
         }
+        public List<Inmueble> ObtenerInmueblesDisponibles(DateTime fechaInicio, DateTime fechaFin)
+        {
+            var lista = new List<Inmueble>();
+            using var conn = _db.GetConnection();
+            conn.Open();
 
+            string sql = @"
+        SELECT i.* 
+        FROM Inmuebles i
+        WHERE i.IdInmueble NOT IN (
+            SELECT c.IdInmueble
+            FROM Contratos c
+            WHERE c.Estado = 1
+            AND (
+                (c.FechaInicio <= @fechaFin AND c.FechaFin >= @fechaInicio)
+            )
+        )";
 
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@fechaInicio", fechaInicio);
+            cmd.Parameters.AddWithValue("@fechaFin", fechaFin);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Inmueble
+                {
+                    IdInmueble = reader.GetInt32("IdInmueble"),
+                    IdPropietario = reader.GetInt32("IdPropietario"),
+                    Direccion = reader.GetString("Direccion"),
+                    Uso = reader.IsDBNull(reader.GetOrdinal("Uso")) ? null : reader.GetString("Uso"),
+                    Tipo = reader.IsDBNull(reader.GetOrdinal("Tipo")) ? null : reader.GetString("Tipo"),
+                    Ambientes = reader.IsDBNull(reader.GetOrdinal("Ambientes")) ? null : reader.GetInt32("Ambientes"),
+                    Superficie = reader.IsDBNull(reader.GetOrdinal("Superficie")) ? null : reader.GetDecimal("Superficie"),
+                    Precio = reader.GetDecimal("Precio"),
+                    Disponible = reader.GetBoolean("Disponible"),
+                });
+            }
+
+            return lista;
+        }
 
     }
 

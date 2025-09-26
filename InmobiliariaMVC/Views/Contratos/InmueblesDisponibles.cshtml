@@ -1,0 +1,45 @@
+@model List<InmobiliariaMVC.Models.Inmueble>
+
+@{
+    ViewData["Title"] = "Inmuebles Disponibles";
+}
+
+<h2>Inmuebles disponibles entre @ViewBag.FechaInicio.ToShortDateString() y @ViewBag.FechaFin.ToShortDateString()</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning">
+        No hay inmuebles disponibles en este rango de fechas.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Dirección</th>
+                <th>Uso</th>
+                <th>Tipo</th>
+                <th>Ambientes</th>
+                <th>Superficie</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var inmueble in Model)
+        {
+            <tr>
+                <td>@inmueble.Direccion</td>
+                <td>@inmueble.Uso</td>
+                <td>@inmueble.Tipo</td>
+                <td>@inmueble.Ambientes</td>
+                <td>@inmueble.Superficie</td>
+                <td>@inmueble.Precio</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+<div>
+    <a asp-action="Create" class="btn btn-secondary">Volver a Crear Contrato</a>
+</div>

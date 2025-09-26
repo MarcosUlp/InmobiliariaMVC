@@ -48,18 +48,40 @@ namespace InmobiliariaMVC.Controllers
         }
 
         // GET: Contratos/Create
+        [HttpGet]
         public IActionResult Create()
         {
             ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
             ViewBag.Inquilinos = repoInquilino.ObtenerTodos();
-            return View();
+            ViewBag.InmueblesDisponibles = null;
+            return View(new Contrato());
         }
 
-        // POST: Contratos/Create
+        // POST: Crear Contrato / Listar inmuebles disponibles
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(Contrato contrato)
+        // POST: Crear Contrato / Listar inmuebles disponibles
+        [HttpPost]
+        public IActionResult Create(Contrato contrato, string accion, DateTime? FechaInicio, DateTime? FechaFin)
         {
+            // Botón "Listar inmuebles disponibles"
+            if (accion == "listar")
+            {
+                if (!FechaInicio.HasValue || !FechaFin.HasValue || FechaInicio > FechaFin)
+                {
+                    TempData["Error"] = "Debes ingresar un rango de fechas válido.";
+                    return RedirectToAction(nameof(Create));
+                }
+
+                ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
+                ViewBag.Inquilinos = repoInquilino.ObtenerTodos();
+                ViewBag.InmueblesDisponibles = repoContrato.ObtenerInmueblesDisponibles(FechaInicio.Value, FechaFin.Value);
+                ViewBag.FechaInicio = FechaInicio.Value;
+                ViewBag.FechaFin = FechaFin.Value;
+
+                return View(contrato);
+            }
+
+            // Botón "Crear contrato"
             if (!ModelState.IsValid)
             {
                 ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
@@ -67,23 +89,27 @@ namespace InmobiliariaMVC.Controllers
                 return View(contrato);
             }
 
-            bool disponible = repoContrato.InmuebleDisponible(contrato.IdInmueble, contrato.FechaInicio, contrato.FechaFin);
+            // VERIFICAR DISPONIBILIDAD DEL INMUEBLE
+            bool disponible = repoContrato.InmuebleDisponible(
+                contrato.IdInmueble,
+                contrato.FechaInicio,
+                contrato.FechaFin
+            );
+
             if (!disponible)
             {
-                ModelState.AddModelError("", "El inmueble ya está reservado o alquilado en esas fechas.");
+                ModelState.AddModelError("", "El inmueble seleccionado ya está alquilado o reservado en esas fechas.");
                 ViewBag.Inmuebles = repoInmueble.ObtenerTodos();
                 ViewBag.Inquilinos = repoInquilino.ObtenerTodos();
                 return View(contrato);
             }
 
-            contrato.Estado = true;
-            contrato.CreadoPor = int.Parse(User.FindFirstValue("IdUsuario")); // ✅ ahora sí
-                                                                              // contrato.FechaCreacion lo pone el NOW() del repo, podés sacarlo si querés
-
+            // Crear contrato
+            contrato.CreadoPor = int.Parse(User.FindFirstValue("IdUsuario")); // asigna creador
             repoContrato.Alta(contrato);
-            return RedirectToAction(nameof(Index));
+            TempData["Success"] = "Contrato creado correctamente";
+            return RedirectToAction("Index");
         }
-
 
 
         // GET: Contratos/Edit/5
@@ -136,6 +162,22 @@ namespace InmobiliariaMVC.Controllers
                 return View(contrato);
             }
         }
+        [HttpGet]
+        public IActionResult InmueblesDisponibles(DateTime? fechaInicio, DateTime? fechaFin)
+        {
+            if (!fechaInicio.HasValue || !fechaFin.HasValue || fechaInicio > fechaFin)
+            {
+                TempData["Error"] = "Debes ingresar un rango de fechas válido.";
+                return RedirectToAction(nameof(Create));
+            }
+
+            var disponibles = repoContrato.ObtenerInmueblesDisponibles(fechaInicio.Value, fechaFin.Value);
+            ViewBag.FechaInicio = fechaInicio.Value;
+            ViewBag.FechaFin = fechaFin.Value;
+
+            return View(disponibles);
+        }
+
 
         // GET: Contratos/Delete/5
         [Authorize(Roles = "Administrador")] // Solo administradores pueden eliminar

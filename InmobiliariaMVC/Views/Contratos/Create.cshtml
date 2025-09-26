@@ -2,14 +2,20 @@
 
 @{
     ViewData["Title"] = "Crear Contrato";
-    var inmuebles = (List<InmobiliariaMVC.Models.Inmueble>)ViewBag.Inmuebles;
-    var inquilinos = (List<InmobiliariaMVC.Models.Inquilino>)ViewBag.Inquilinos;
+    var inmuebles = ViewBag.Inmuebles as List<InmobiliariaMVC.Models.Inmueble> ?? new
+    List<InmobiliariaMVC.Models.Inmueble>();
+    var inquilinos = ViewBag.Inquilinos as List<InmobiliariaMVC.Models.Inquilino> ?? new
+    List<InmobiliariaMVC.Models.Inquilino>();
+    var inmueblesDisponibles = ViewBag.InmueblesDisponibles as List<InmobiliariaMVC.Models.Inmueble> ?? new
+    List<InmobiliariaMVC.Models.Inmueble>();
 }
 
 <h1>Crear Contrato</h1>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
+        <!-- FORMULARIO CREAR CONTRATO -->
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -49,18 +55,80 @@
                 <span asp-validation-for="PrecioMensual" class="text-danger"></span>
             </div>
 
-            <!-- No hace falta campo Estado, se setea por defecto -->
-            <div class="form-group">
-                <input type="hidden" asp-for="Estado" value="true" />
-            </div>
+            <input type="hidden" asp-for="Estado" value="true" />
 
-            <div class="form-group">
-                <input type="submit" value="Crear" class="btn btn-primary" />
+            <div class="form-group mt-2">
+                <input type="submit" value="Crear Contrato" class="btn btn-primary" name="accion" value="crear" />
             </div>
         </form>
+
+        <hr />
+
+        <!-- FORMULARIO LISTAR INMUEBLES DISPONIBLES -->
+        <form method="post" asp-action="Create">
+            <div class="form-group">
+                <label>Fecha Inicio</label>
+                <input type="date" name="FechaInicio" class="form-control"
+                    value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="form-group">
+                <label>Fecha Fin</label>
+                <input type="date" name="FechaFin" class="form-control"
+                    value="@Model.FechaFin.ToString("yyyy-MM-dd")" />
+            </div>
+            <button type="submit" class="btn btn-info mt-2" name="accion" value="listar">
+                Listar inmuebles disponibles
+            </button>
+        </form>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger mt-2">
+                @TempData["Error"]
+            </div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success mt-2">
+                @TempData["Success"]
+            </div>
+        }
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Volver al Listado</a>
-</div>
+@if (inmueblesDisponibles.Any())
+{
+    <h2>Inmuebles disponibles entre @ViewBag.FechaInicio?.ToShortDateString() y @ViewBag.FechaFin?.ToShortDateString()</h2>
+
+    <table class="table table-striped mt-2">
+        <thead>
+            <tr>
+                <th>Dirección</th>
+                <th>Uso</th>
+                <th>Tipo</th>
+                <th>Ambientes</th>
+                <th>Superficie</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var inmueble in inmueblesDisponibles)
+            {
+                <tr>
+                    <td>@inmueble.Direccion</td>
+                    <td>@inmueble.Uso</td>
+                    <td>@inmueble.Tipo</td>
+                    <td>@inmueble.Ambientes</td>
+                    <td>@inmueble.Superficie</td>
+                    <td>@inmueble.Precio</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (ViewBag.InmueblesDisponibles != null)
+{
+    <div class="alert alert-warning mt-2">
+        No hay inmuebles disponibles en este rango de fechas.
+    </div>
+}
