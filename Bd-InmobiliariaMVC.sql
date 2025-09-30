@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-09-2025 a las 22:24:28
+-- Tiempo de generación: 30-09-2025 a las 06:44:33
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -49,7 +49,8 @@ CREATE TABLE `contratos` (
 
 INSERT INTO `contratos` (`IdContrato`, `IdInmueble`, `IdInquilino`, `FechaInicio`, `FechaFin`, `PrecioMensual`, `Estado`, `CreadoPor`, `FechaCreacion`, `AnuladoPor`, `FechaAnulacion`) VALUES
 (24, 7, 8, '2025-02-05', '2026-02-05', 1700000.00, 1, 2, '2025-09-26 17:18:59', NULL, NULL),
-(25, 10, 9, '2025-05-03', '2027-05-03', 280000.00, 1, 2, '2025-09-26 17:19:31', NULL, NULL);
+(25, 10, 9, '2025-05-03', '2027-05-03', 280000.00, 1, 2, '2025-09-26 17:19:31', NULL, NULL),
+(26, 8, 12, '2025-10-04', '2025-10-06', 350000.00, 1, 2, '2025-09-30 01:35:54', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -103,7 +104,10 @@ CREATE TABLE `inquilinos` (
 INSERT INTO `inquilinos` (`IdInquilino`, `Nombre`, `Apellido`, `Dni`, `Telefono`, `Email`, `Estado`) VALUES
 (8, 'marcos', 'giraudi', '42562212', '2665034499', 'giraudi@gmail.com', 1),
 (9, 'samuel', 'alvarez', '41851232', '2657345631', 'alvarez@gmail.com', 1),
-(10, 'leny', 'tavarez', '42683565', '266543123', 'leny@gmail.com', 1);
+(10, 'leny', 'tavarez', '42683565', '266543123', 'leny@gmail.com', 1),
+(11, 'Laura', 'Fernandez', '32458671', '114558234', 'laura.fernandez@gmail.com', 1),
+(12, 'Martín', 'Pereyra', '28745790', '161249834', 'martin.pereyra@hotmail.com', 1),
+(13, 'Julieta', 'Gonzales', '402345923', '2657889942', 'julietaGonzalez@gmail.com', 1);
 
 -- --------------------------------------------------------
 
@@ -145,7 +149,6 @@ CREATE TABLE `propietarios` (
   `Dni` longtext NOT NULL,
   `Telefono` longtext NOT NULL,
   `Email` longtext NOT NULL,
-  `Clave` longtext NOT NULL,
   `Estado` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -153,9 +156,12 @@ CREATE TABLE `propietarios` (
 -- Volcado de datos para la tabla `propietarios`
 --
 
-INSERT INTO `propietarios` (`IdPropietario`, `Nombre`, `Apellido`, `Dni`, `Telefono`, `Email`, `Clave`, `Estado`) VALUES
-(7, 'javier', 'cantaruti', '19485374', '2657494565', 'cantarutis@gmail.com', '', 1),
-(8, 'marcos', 'Di palma', '31984343', '2657654321', 'marquitos@gmail.com', '', 1);
+INSERT INTO `propietarios` (`IdPropietario`, `Nombre`, `Apellido`, `Dni`, `Telefono`, `Email`, `Estado`) VALUES
+(7, 'javier', 'cantaruti', '19485374', '2657494565', 'cantarutis@gmail.com', 1),
+(8, 'marcos', 'Di palma', '31984343', '2657654321', 'marquitos@gmail.com', 1),
+(9, 'Camila', 'Rodriguez', '42356331', '2665438552', 'camilarodriguez@live.com', 1),
+(10, 'juana', 'Diarco', '4568921', '2668294752', 'diarco@gmail.com', 1),
+(11, 'Ramiro', 'Altamira', '42567545', '2665403495', 'ramialtamira@gmail.com', 1);
 
 -- --------------------------------------------------------
 
@@ -235,7 +241,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `contratos`
 --
 ALTER TABLE `contratos`
-  MODIFY `IdContrato` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `IdContrato` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT de la tabla `inmuebles`
@@ -247,7 +253,7 @@ ALTER TABLE `inmuebles`
 -- AUTO_INCREMENT de la tabla `inquilinos`
 --
 ALTER TABLE `inquilinos`
-  MODIFY `IdInquilino` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `IdInquilino` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
@@ -259,7 +265,7 @@ ALTER TABLE `pagos`
 -- AUTO_INCREMENT de la tabla `propietarios`
 --
 ALTER TABLE `propietarios`
-  MODIFY `IdPropietario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `IdPropietario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
